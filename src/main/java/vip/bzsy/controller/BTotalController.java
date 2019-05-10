@@ -94,7 +94,7 @@ public class BTotalController {
         log.info("准备开始下载模板");
         HSSFWorkbook workbook = copyDownMax(listMaxResult, type2VoListResult, dateNum);
         //5.创建文件名
-        String fileName = dateNum + ".xlsx";
+        String fileName = dateNum + ".xls";
         log.info(fileName);
         //6.获取输出流对象
         response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "utf-8"));
@@ -603,7 +603,7 @@ public class BTotalController {
         row1.createCell(3).setCellValue(2);
         row1.createCell(4).setCellValue(3);
         //5.创建文件名
-        String fileName = "上传模板.xlsx";
+        String fileName = "上传模板.xls";
         //6.获取输出流对象
         response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "utf-8"));
         response.setContentType("multipart/form-data");
