@@ -588,12 +588,18 @@ public class BTotalController {
         row.createCell(10).setCellValue("9");
         row.createCell(11).setCellValue("3000数之样式");
         row.createCell(12).setCellValue("需要上传的3000数");
+        row.createCell(14).setCellValue("第一个参数");
+        row.createCell(15).setCellValue("第二个参数");
+        row.createCell(16).setCellValue("第三个参数");
+        row.createCell(17).setCellValue("第四个参数");
+        row.createCell(18).setCellValue("第五个参数");
         //赋值3000模板书数
-        List<Integer> anInt = get3000Int();
+        Integer[] anInt = new Integer[]{0,1,2,3,4,5,6,7,8,9};
         for (Integer num : anInt) {
             int lastRowNum = sheet.getLastRowNum();//获取最后一行的行号
             HSSFRow dataRow = sheet.createRow(lastRowNum + 1);
             dataRow.createCell(11).setCellValue(num);
+            dataRow.createCell(12).setCellValue(num);
         }
         //模板日期
         HSSFRow row1 = sheet.getRow(1);
@@ -747,7 +753,7 @@ public class BTotalController {
     /**
      * 多少组  300W 多1
      */
-    private static Integer groupInt = 3000001;
+    private static Integer groupInt = 300001;
     /**
      * 多少条数据 10
      */
