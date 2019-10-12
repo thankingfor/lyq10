@@ -14,6 +14,7 @@ import vip.bzsy.common.CommonUtils;
 import vip.bzsy.common.DataCheckException;
 import vip.bzsy.model.*;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -572,7 +573,7 @@ public class BTotalController {
      */
     @ResponseBody
     @RequestMapping(value = "/check")
-    private CommonResponse checkMap() {
+    public CommonResponse checkMap() {
         if (dataMap.size() == groupInt) {
             return CommonResponse.success("数据合法");
         }
@@ -789,6 +790,9 @@ public class BTotalController {
     public static void setDataMap(Map<Integer, List<LyqTable>> data) {
         dataMap.putAll(data);
     }
+
+    @Resource
+    private AppContent appContent;
 
     /**
      * 多少组  300W 多1 默认整万 + 1 个数
