@@ -27,7 +27,6 @@ public class MainUtils {
 
     private static Map<Integer, List<LyqTable>> dataMap = BTotalController.dataMap;
     // 第一组的所有数
-    private static List<LyqTable> mainList = dataMap.get(0);
     private static Integer totalCount = BTotalController.groupInt;
     // 每一万合成一个String对象
     private static Integer splIndex = 10000;
@@ -63,10 +62,11 @@ public class MainUtils {
         String dataStr = getDateListStr(appContent.getLyqDateList());
         appContent.setLyqDateListStr(dataStr);
         // 2. 主要数据
-        Integer totalNum = totalCount / 10 + 1;
+        appContent.setDataMap(dataMap);
+        Integer totalNum = totalCount / splIndex + 1;
         // 默认一万个数一组
         String[] arr = new String[totalNum];
-        arr[0] = getListStr(mainList);
+        arr[0] = getListStr(dataMap.get(0));
         for (int i = 1; i < totalNum; i++) {
             arr[i] = getArrStr(i * splIndex);
         }
@@ -86,6 +86,9 @@ public class MainUtils {
 
     private List<LyqDate> getDateList(String dateStr) {
         List<LyqDate> lyqDateList = new LinkedList<>();
+        if (dateStr == null || "".equals(dateStr)) {
+            return lyqDateList;
+        }
         String[] objs = dateStr.split(separator2);
         for (String obj : objs) {
             String[] items = obj.split(separator1);

@@ -1,6 +1,8 @@
 package vip.bzsy.common;
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import vip.bzsy.model.*;
 
@@ -31,7 +33,7 @@ public class ReadAndDownUtils {
             file.mkdirs();
         }
         //设置请求头
-        try (OutputStream outputStream = new FileOutputStream(file)
+        try (OutputStream outputStream = new FileOutputStream(new File(appContent.getDataPathData()))
              ; ObjectOutputStream oos = new ObjectOutputStream(outputStream)) {
             oos.writeObject(appContent);
             log.info("日期对象写入成功！！！");
@@ -50,8 +52,9 @@ public class ReadAndDownUtils {
         long time3 = System.currentTimeMillis();
         //如果日期数据存在就加载
         if (new File(appContent.getDataPath()).exists()) {
-            try (ObjectInputStream oos = new ObjectInputStream(new FileInputStream(appContent.getDataPath()))) {
-                appContent = (AppContent) oos.readObject();
+            try (ObjectInputStream oos = new ObjectInputStream(new FileInputStream(appContent.getDataPathData()))) {
+                AppContent appContent2 = (AppContent) oos.readObject();
+                copy(appContent2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -60,5 +63,11 @@ public class ReadAndDownUtils {
         long time4 = System.currentTimeMillis();
         log.info("一共用时" + (time4 - time3) / 1000 + "秒");
         return CommonResponse.success("一共用时" + (time4 - time3) / 1000 + "秒");
+    }
+
+    private void copy(AppContent appContent2) {
+        appContent.setLyqDateListStr(appContent2.getLyqDateListStr());
+        appContent.setDescArray(appContent2.getDescArray());
+        appContent.setAscArray(appContent2.getAscArray());
     }
 }

@@ -670,7 +670,7 @@ public class BTotalController {
     @ResponseBody
     @RequestMapping(value = "/down/obj")
     public CommonResponse dataMapdonwloadobj() {
-
+        appContent.setLyqDateList(lyqDateList);
         return mainUtils.downFile();
     }
 
@@ -680,8 +680,9 @@ public class BTotalController {
     @ResponseBody
     @RequestMapping(value = "/get/obj")
     public CommonResponse getobj() {
-
-        return mainUtils.readFile();
+        CommonResponse commonResponse = mainUtils.readFile();
+        dataMap = appContent.getDataMap();
+        return commonResponse;
     }
 
     /**
@@ -725,7 +726,7 @@ public class BTotalController {
     /**
      * 多少组  300W 多1 默认整万 + 1 个数
      */
-    public static Integer groupInt = 300001;
+    public static Integer groupInt = 3000001;
     /**
      * 多少条数据 10
      */
