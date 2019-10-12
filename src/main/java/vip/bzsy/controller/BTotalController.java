@@ -301,6 +301,39 @@ public class BTotalController {
     }
 
     /**
+     * 分析
+     * 分析2
+     * 分析3
+     * 分析4
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/analyze")
+    public CommonResponse analyze() {
+        analyze2();
+        return CommonResponse.success();
+    }
+
+    private void analyze2() {
+        Integer maxGroup = groupInt / anzGroupNum;
+        Integer start = 1;
+        Integer groupNum = 1;
+        for (; groupNum <= maxGroup; groupNum ++) {
+            // 一大组
+            List<LyqTable> groupTables = new LinkedList<>();
+            for (; start <= groupNum * anzGroupNum; start ++) {
+                List<LyqTable> lyqTables = dataMap.get(start);
+                // 每一组进行排序
+                lyqTables.sort((a, b) -> b.getLyqValue() - a.getLyqValue());
+                groupTables.addAll(lyqTables);
+            }
+            // 排序一大组根据变量
+            groupTables.sort((a, b) -> b.getLyqValue() - a.getLyqValue());
+        }
+
+    }
+
+    /**
      * 8.上传数据
      *
      * @param file
@@ -574,6 +607,11 @@ public class BTotalController {
         sheet.setColumnWidth(10, 720);
         sheet.setColumnWidth(11, 1440 * 3);
         sheet.setColumnWidth(12, 1440 * 3);
+        sheet.setColumnWidth(14, 1440 * 2);
+        sheet.setColumnWidth(15, 1440 * 2);
+        sheet.setColumnWidth(16, 1440 * 2);
+        sheet.setColumnWidth(17, 1440 * 2);
+        sheet.setColumnWidth(18, 1440 * 2);
         HSSFRow row = sheet.createRow(0);
         row.createCell(0).setCellValue("期号");
         row.createCell(1).setCellValue("0");
@@ -605,9 +643,11 @@ public class BTotalController {
         HSSFRow row1 = sheet.getRow(1);
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         row1.createCell(0).setCellValue(format.format(new Date()) + "01");
-        row1.createCell(2).setCellValue(1);
-        row1.createCell(3).setCellValue(2);
-        row1.createCell(4).setCellValue(3);
+        row1.createCell(14).setCellValue(0);
+        row1.createCell(15).setCellValue(2);
+        row1.createCell(16).setCellValue(4);
+        row1.createCell(17).setCellValue(6);
+        row1.createCell(18).setCellValue(9);
         //5.创建文件名
         String fileName = "上传模板.xls";
         //6.获取输出流对象
@@ -751,31 +791,36 @@ public class BTotalController {
     }
 
     /**
-     * 多少组  300W 多1
+     * 多少组  300W 多1 默认整万 + 1 个数
      */
-    private static Integer groupInt = 300001;
+    public static Integer groupInt = 300001;
     /**
      * 多少条数据 10
      */
-    private static Integer groupRow = 10;
+    public static Integer groupRow = 10;
 
     /**
      * 多少组在分一组 21
      */
-    private static Integer groupNum = 21;
+    public static Integer groupNum = 21;
+
+    /**
+     * 分析数据为多少一组 v2
+     */
+    public static Integer anzGroupNum = 19;
 
     public static Map<Integer, List<LyqTable>> dataMap = new ConcurrentHashMap<>();
 
-    private static List<LyqDate> lyqDateList = new ArrayList<>();
+    public static List<LyqDate> lyqDateList = new ArrayList<>();
 
-    private static Map<String, Object> map = new HashMap<>();
+    public static Map<String, Object> map = new HashMap<>();
 
-    private static Map<String, Object> intByFile = new HashMap<>();
+    public static Map<String, Object> intByFile = new HashMap<>();
 
     /**
      * 多线程下载 每个线程分配的数量
      */
-    private static Integer PAGE = 100000;
+    public static Integer PAGE = 100000;
 
     public static AtomicInteger atomicInteger = new AtomicInteger();
 
@@ -785,12 +830,12 @@ public class BTotalController {
 
     public static Integer threadNum = groupInt / PAGE;// 这是要开启的线程数   因为是300W多一组 怎么也不会整除
 
-    private static String outPath = "D:/lyq10/内存数据";
+    public static String outPath = "D:/lyq10/内存数据";
 
-    private static String dataoutPath = "D:/lyq10/日期数据.txt";
+    public static String dataoutPath = "D:/lyq10/日期数据.txt";
 
     /**
      * 随机对象
      */
-    private static Random random = new Random();
+    public static Random random = new Random();
 }
