@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vip.bzsy.common.CommonResponse;
 import vip.bzsy.common.CommonUtils;
 import vip.bzsy.common.DataCheckException;
+import vip.bzsy.common.MainUtils;
 import vip.bzsy.model.*;
 
 import javax.annotation.Resource;
@@ -362,9 +363,9 @@ public class BTotalController {
         HSSFCell cellDateNum = row.getCell(0);
         cellDateNum.setCellType(HSSFCell.CELL_TYPE_STRING);
         String dateNum = cellDateNum.getStringCellValue();
-        LyqDate lyqDate = new LyqDate()
-                .setDateNum(dateNum)
-                .setValue(ids);
+        LyqDate lyqDate = new LyqDate();
+        lyqDate.setDateNum(dateNum);
+        lyqDate.setValue(ids);
         log.info("上传数据之日期对象" + lyqDate.toString());
         CommonResponse replace = replace(lyqDate);
         if (replace.getCode() == 0)
@@ -407,7 +408,10 @@ public class BTotalController {
             return CommonResponse.fail("期号重复了！！！");
         }
         log.info("获取上传日期" + dateNum);
-        lyqDateList.add(new LyqDate().setDateNum(dateNum).setValue("-"));
+        LyqDate lyqDate = new LyqDate();
+        lyqDate.setDateNum(dateNum);
+        lyqDate.setValue("-");
+        lyqDateList.add(lyqDate);
         List<Integer> listant = new LinkedList<>();
         for (int i = 0; i < groupRow; i++) {
             HSSFCell cell = sheet.getRow(i + 1).getCell(12);
@@ -573,7 +577,7 @@ public class BTotalController {
      */
     @ResponseBody
     @RequestMapping(value = "/check")
-    public CommonResponse checkMap() {
+    private CommonResponse checkMap() {
         if (dataMap.size() == groupInt) {
             return CommonResponse.success("数据合法");
         }
@@ -662,93 +666,22 @@ public class BTotalController {
 
     /**
      * 下载数据
-     * @param request
-     * @param response
-     * @return
      */
     @ResponseBody
     @RequestMapping(value = "/down/obj")
-    public CommonResponse dataMapdonwloadobj(HttpServletRequest request, HttpServletResponse response) throws InterruptedException {
-        long time3 = System.currentTimeMillis();
-        if (checkMap().getCode() == 0) {
-            return CommonResponse.fail("内存不存在！先初始化数据 或者 读取系统文件");
-        }
-        File file = new File(outPath);
-        File datefile = new File(dataoutPath);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        //设置请求头
-        try (OutputStream outputStream = new FileOutputStream(datefile)
-             ; ObjectOutputStream oos = new ObjectOutputStream(outputStream)) {
-            oos.writeObject(lyqDateList);
-            log.info("日期对象写入成功！！！");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //开始多线程去执行任务
-        atomicInteger.set(0);//初始化为0
-        isTrue  =  true;//默认执行成功
-        for (int i = 0; i < threadNum;i++){
-            new Thread(new DownFile(i*PAGE,(i+1)*PAGE-1,outPath)).start();
-        }
-        new Thread(new DownFile(threadNum*PAGE,groupInt-1,outPath)).start();//不足page的
-        log.info("主线程正在等待");
-        int count = 0;
-        while (atomicInteger.get()!=threadNum+1){
-            TimeUnit.SECONDS.sleep(6);
-            log.info("主线程正在等待"+(count++)*6+"秒");
-        }
-        long time4 = System.currentTimeMillis();
-        if (!isTrue){
-            return CommonResponse.success("执行失败");
-        }
-        print("一共分了"+threadNum+"线程去执行任务，等待完成", time3, time4);
-        return CommonResponse.success("一共消耗了" + (time4 - time3) / 1000 + "秒");
+    public CommonResponse dataMapdonwloadobj() {
+
+        return mainUtils.downFile();
     }
 
     /**
      * 上传数据
-     * @param request
-     * @param response
-     * @return
      */
     @ResponseBody
     @RequestMapping(value = "/get/obj")
-    public CommonResponse getobj(HttpServletRequest request, HttpServletResponse response) throws InterruptedException {
-        dataMap.clear();
-        long time3 = System.currentTimeMillis();
-        //如果日期数据存在就加载
-        if (new File(dataoutPath).exists()) {
-            try (ObjectInputStream oos = new ObjectInputStream(new FileInputStream(dataoutPath));) {
-                lyqDateList = (List<LyqDate>) oos.readObject();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            log.info("日期对象加载成功！！！");
-        }
-        if (!new File(outPath).exists()) {
-            return CommonResponse.fail("数据不存在！1.先初始化数据2.下载数据");
-        }
-        //开始多线程去执行任务
-        atomicInteger.set(0);//初始化为0
-        isTrue  =  true;//默认执行成功
-        for (int i = 0; i < threadNum;i++){
-            new Thread(new ReadFile(i*PAGE,(i+1)*PAGE-1,outPath)).start();
-        }
-        new Thread(new ReadFile(threadNum*PAGE,groupInt-1,outPath)).start();//不足page的
-        log.info("主线程正在等待");
-        int count = 0;
-        while (atomicInteger.get()!=threadNum+1){
-            TimeUnit.SECONDS.sleep(6);
-            log.info("主线程正在等待"+(count++)*6+"秒");
-        }
-        long time4 = System.currentTimeMillis();
-        if (!isTrue){
-            return CommonResponse.success("执行失败");
-        }
-        print("一共消耗了", time3, time4);
-        return CommonResponse.success("一共用时" + (time4 - time3) / 1000 + "秒");
+    public CommonResponse getobj() {
+
+        return mainUtils.readFile();
     }
 
     /**
@@ -766,10 +699,6 @@ public class BTotalController {
 
     /**
      * 打印工具
-     * @param value
-     * @param start
-     * @param end
-     * @return
      */
     public static long print(String value, Long start, Long end) {
         log.info(value + (end - start));
@@ -787,9 +716,8 @@ public class BTotalController {
         iterator.forEachRemaining(key -> log.info(dataMap.get(key).toString()));
     }
 
-    public static void setDataMap(Map<Integer, List<LyqTable>> data) {
-        dataMap.putAll(data);
-    }
+    @Resource
+    private MainUtils mainUtils;
 
     @Resource
     private AppContent appContent;
@@ -833,10 +761,6 @@ public class BTotalController {
     public static Boolean isTrue;
 
     public static Integer threadNum = groupInt / PAGE;// 这是要开启的线程数   因为是300W多一组 怎么也不会整除
-
-    public static String outPath = "D:/lyq10/内存数据";
-
-    public static String dataoutPath = "D:/lyq10/日期数据.txt";
 
     /**
      * 随机对象

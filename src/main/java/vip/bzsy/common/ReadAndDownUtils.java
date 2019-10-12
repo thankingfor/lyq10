@@ -8,9 +8,6 @@ import javax.annotation.Resource;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static vip.bzsy.controller.BTotalController.dataoutPath;
 
 /**
  * @author ：李延富
@@ -53,7 +50,7 @@ public class ReadAndDownUtils {
         long time3 = System.currentTimeMillis();
         //如果日期数据存在就加载
         if (new File(appContent.getDataPath()).exists()) {
-            try (ObjectInputStream oos = new ObjectInputStream(new FileInputStream(dataoutPath));) {
+            try (ObjectInputStream oos = new ObjectInputStream(new FileInputStream(appContent.getDataPath()))) {
                 appContent = (AppContent) oos.readObject();
             } catch (Exception e) {
                 e.printStackTrace();

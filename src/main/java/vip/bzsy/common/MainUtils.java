@@ -58,7 +58,7 @@ public class MainUtils {
     /**
      * 下载方法
      */
-    public void downFile() {
+    public CommonResponse downFile() {
         // 1. 日期对象
         String dataStr = getDateListStr(appContent.getLyqDateList());
         appContent.setLyqDateListStr(dataStr);
@@ -72,7 +72,7 @@ public class MainUtils {
         }
         appContent.setDescArray(arr);
         // 下载
-        downUtils.down();
+        return downUtils.down();
     }
 
     private String getDateListStr(List<LyqDate> lyqDateList) {
