@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,30 @@ public class AppContent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 定义
+     */
+    /*多少组  300W 多1 默认整万 + 1 个数*/
+    public Integer groupInt = 300001;
+    /*多少条数据 10*/
+    public Integer groupRow = 10;
+    /*多少组在分一组 21*/
+    public Integer groupNum = 21;
+    /*分析数据为多少一组 v2*/
+    public Integer anzGroupNum = 19;
+
+    /**
+     * 存放上传的数据 10个中的数字
+     */
+    private String upDateNum;
+    private List<Integer> upNums;
+    private String upNumsStr;
+    private List<Integer> upList10;
+
+
+    /**
      * 日期对象
      */
-    private transient List<LyqDate> lyqDateList;
+    private transient List<LyqDate> lyqDateList = new ArrayList<>();
     private String lyqDateListStr;
 
     /**

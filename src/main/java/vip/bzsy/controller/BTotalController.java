@@ -15,6 +15,7 @@ import vip.bzsy.common.DataCheckException;
 import vip.bzsy.common.MainUtils;
 import vip.bzsy.model.*;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -24,8 +25,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -51,8 +50,8 @@ public class BTotalController {
          * 第一项任务
          */
         long time1 = System.currentTimeMillis();
-        List<Integer> anInt = (List<Integer>) intByFile.get("list");
-        String dateNum = (String) intByFile.get("dateNum");
+        List<Integer> anInt = appContent.getUpList10();
+        String dateNum = appContent.getUpDateNum();
         List<LyqTable> list0 = copyStart(anInt);//获取第0组并且按照排序
         List<LyqTable> listMax = new LinkedList<>();//存放最大值
         //开始修改0-3000组的key
@@ -337,55 +336,26 @@ public class BTotalController {
 
     /**
      * 8.上传数据
-     *
-     * @param file
-     * @return
-     * @throws IOException
      */
     @ResponseBody
     @RequestMapping("/upload")
     private CommonResponse getIntByFile(MultipartFile file) throws IOException, DataCheckException {
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
-        HSSFSheet sheet = workbook.getSheetAt(0);
-        HSSFRow row = sheet.getRow(1);
-        String ids = "";
-        for (int i = 1; i <= 10; i++) {
-            String cellStringValue = CommonUtils.getCellStringValue(row.getCell(i)).trim();
-            log.info(cellStringValue);
-            if (CommonUtils.isNotEmpty(cellStringValue)) {
-                Integer num = Integer.valueOf(cellStringValue.substring(0, 1));
-                if (ids == "")
-                    ids = num + "";
-                else
-                    ids = ids + "," + num;
-            }
-        }
-        HSSFCell cellDateNum = row.getCell(0);
-        cellDateNum.setCellType(HSSFCell.CELL_TYPE_STRING);
-        String dateNum = cellDateNum.getStringCellValue();
+        mainUtils.resolver1(workbook);
+        mainUtils.resolver2(workbook);
+        // ----> 上传数据
         LyqDate lyqDate = new LyqDate();
-        lyqDate.setDateNum(dateNum);
-        lyqDate.setValue(ids);
-        log.info("上传数据之日期对象" + lyqDate.toString());
+        lyqDate.setDateNum(appContent.getUpDateNum());
+        lyqDate.setValue(appContent.getUpNumsStr());
         CommonResponse replace = replace(lyqDate);
         if (replace.getCode() == 0)
             return CommonResponse.fail("日期号码重复了");
-        List<Integer> listant = new LinkedList<>();
-        for (int i = 0; i < groupRow; i++) {
-            HSSFCell cell = sheet.getRow(i + 1).getCell(12);
-            String cellStringValue = CommonUtils.getCellStringValue(cell);
-            if (CommonUtils.isNotEmpty(cellStringValue)) {
-                cellStringValue = cellStringValue.substring(0, cellStringValue.length() - 2);
-                listant.add(Integer.valueOf(cellStringValue));
-            }
-        }
-        //log.info("上传数据之list集合" + listant.toString());
-        intByFile.clear();
-        intByFile.put("dateNum", lyqDate.getDateNum());
-        intByFile.put("list", listant);
-        log.info("解析完毕上传的数据" + intByFile.toString());
+        // ----> 上传数据
         return CommonResponse.success();
     }
+
+
+
     /**
      * 8.2  第二步单独操作
      *
@@ -412,20 +382,11 @@ public class BTotalController {
         lyqDate.setDateNum(dateNum);
         lyqDate.setValue("-");
         lyqDateList.add(lyqDate);
-        List<Integer> listant = new LinkedList<>();
-        for (int i = 0; i < groupRow; i++) {
-            HSSFCell cell = sheet.getRow(i + 1).getCell(12);
-            String cellStringValue = CommonUtils.getCellStringValue(cell);
-            if (CommonUtils.isNotEmpty(cellStringValue)) {
-                cellStringValue = cellStringValue.substring(0, cellStringValue.length() - 2);
-                listant.add(Integer.valueOf(cellStringValue));
-            }
-        }
-        //log.info("上传数据之list集合" + listant.toString());
-        intByFile.clear();
-        intByFile.put("dateNum", dateNum);
-        intByFile.put("list", listant);
-        log.info("解析完毕上传的数据" + intByFile.toString());
+
+        appContent.setUpDateNum(dateNum);
+        appContent.setUpNumsStr("-");
+        appContent.setUpNums(new ArrayList<>());
+        mainUtils.resolver2(workbook);
         return CommonResponse.success();
     }
     /**
@@ -723,45 +684,33 @@ public class BTotalController {
     @Resource
     private AppContent appContent;
 
-    /**
-     * 多少组  300W 多1 默认整万 + 1 个数
-     */
-    public static Integer groupInt = 3000001;
-    /**
-     * 多少条数据 10
-     */
-    public static Integer groupRow = 10;
+    @PostConstruct
+    public void init() {
+        groupRow = appContent.getGroupRow();
+        groupInt = appContent.getGroupInt();
+        groupNum = appContent.getGroupNum();
+        anzGroupNum = appContent.getAnzGroupNum();
+        dataMap = appContent.getDataMap();
+        ascDataMap = appContent.getAscDataMap();
+        lyqDateList = appContent.getLyqDateList();
+    }
 
-    /**
-     * 多少组在分一组 21
-     */
-    public static Integer groupNum = 21;
+    /*多少组  300W 多1 默认整万 + 1 个数*/
+    public Integer groupInt;
+    /*多少条数据 10*/
+    public Integer groupRow;
+    /*多少组在分一组 21*/
+    public Integer groupNum = 21;
+    /*分析数据为多少一组 v2*/
+    public Integer anzGroupNum = 19;
+    // 降序map 和 升序map
+    public Map<Integer, List<LyqTable>> dataMap;
+    public Map<Integer, List<LyqTable>> ascDataMap;
+    // 日期list
+    public List<LyqDate> lyqDateList;
 
-    /**
-     * 分析数据为多少一组 v2
-     */
-    public static Integer anzGroupNum = 19;
-
-    public static Map<Integer, List<LyqTable>> dataMap = new ConcurrentHashMap<>();
-
-    public static List<LyqDate> lyqDateList = new ArrayList<>();
-
-    public static Map<String, Object> map = new HashMap<>();
-
-    public static Map<String, Object> intByFile = new HashMap<>();
-
-    /**
-     * 多线程下载 每个线程分配的数量
-     */
-    public static Integer PAGE = 100000;
-
-    public static AtomicInteger atomicInteger = new AtomicInteger();
-
-    public static Object lock = new Object();
-
-    public static Boolean isTrue;
-
-    public static Integer threadNum = groupInt / PAGE;// 这是要开启的线程数   因为是300W多一组 怎么也不会整除
+    // 负责返回数据用的
+    private Map<String, Object> map = new HashMap<>();
 
     /**
      * 随机对象
