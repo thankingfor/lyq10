@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import vip.bzsy.common.CommonResponse;
-import vip.bzsy.common.CommonUtils;
 import vip.bzsy.common.DataCheckException;
 import vip.bzsy.common.MainUtils;
 import vip.bzsy.enums.Way;
@@ -26,7 +25,6 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -54,13 +52,20 @@ public class BTotalController {
         long time1 = System.currentTimeMillis();
         List<Integer> anInt = appContent.getUpList10();
         String dateNum = appContent.getUpDateNum();
-        List<LyqTable> list0 = copyStart(anInt);//获取第0组并且按照排序
-        List<LyqTable> listMax = new LinkedList<>();//存放最大值
+        List<LyqTable> list0Desc = copyStart(anInt, Way.DESC);//获取第0组并且按照排序
+        List<LyqTable> list0Asc = copyStart(anInt, Way.ASC);//获取第0组并且按照排序
+        List<LyqTable> listMaxDesc = new LinkedList<>();//存放最大值
+        List<LyqTable> listMaxAsc = new LinkedList<>();//存放最大值
         //开始修改0-3000组的key
         for (int group = 1; group < groupInt; group++) {
-            List<LyqTable> tables = copySort(list0, group);//本组的降序的tables
-            listMax.add(tables.get(0));//把最大的值存放
-            list0 = tables;//把list0改成下一组的方便循环
+            List<LyqTable> tables = copySort(list0Desc, group, dataMap, Way.DESC);//本组的降序的tables
+            listMaxDesc.add(tables.get(0));//把最大的值存放
+            list0Desc = tables;//把list0改成下一组的方便循环
+        }
+        for (int group = 1; group < groupInt; group++) {
+            List<LyqTable> tables = copySort(list0Asc, group, dataMap, Way.ASC);//本组的降序的tables
+            listMaxAsc.add(tables.get(0));//把最大的值存放
+            list0Asc = tables;//把list0改成下一组的方便循环
         }
         long time2 = System.currentTimeMillis();
         print("第一个任务耗时：", time1, time2);
@@ -69,7 +74,9 @@ public class BTotalController {
          * 按照lyq_seq进行排序
          */
         long time3 = System.currentTimeMillis();
-        List<Type2Vo> type2VoListType = new LinkedList<>();
+        List<Type2Vo> type2VoListTypeDesc = new LinkedList<>();
+        List<Type2Vo> type2VoListTypeAsc = new LinkedList<>();
+
         Map<Integer, List<LyqTable>> listMap = new HashMap<>();
         Integer groupType2 = 1;
         for (int group = 1; group < groupInt; group++) {
@@ -79,23 +86,40 @@ public class BTotalController {
             if (group % groupNum == 0) {
                 //log.info("正在处理第二个任务，目前第"+groupType2+"组");
                 List<Type2Vo> type2VoList = sortType2(listMap, groupType2);
-                type2VoListType.addAll(type2VoList);
+                type2VoListTypeDesc.addAll(type2VoList);
+                listMap.clear();
+                groupType2++;
+            }
+        }
+        groupType2 = 1;
+        for (int group = 1; group < groupInt; group++) {
+            List<LyqTable> listgroup = ascDataMap.get(group);
+            listgroup.sort((x, y) -> x.getLyqSeq() - y.getLyqSeq());
+            listMap.put(group, listgroup);
+            if (group % groupNum == 0) {
+                //log.info("正在处理第二个任务，目前第"+groupType2+"组");
+                List<Type2Vo> type2VoList = sortType2(listMap, groupType2);
+                type2VoListTypeAsc.addAll(type2VoList);
                 listMap.clear();
                 groupType2++;
             }
         }
         //type2VoListType最终排序
         //type2VoListType补充key
-        type2VoListType = setLyqDates(type2VoListType);
+        type2VoListTypeDesc = setLyqDates(type2VoListTypeDesc, Way.DESC);
+        type2VoListTypeAsc = setLyqDates(type2VoListTypeAsc, Way.ASC);
         //进行下载操作 取最大的5000个最大值  取前2000个最大值
-        List<LyqTable> listMaxResult = listMax.stream().sorted((x, y) -> y.getLyqValue() - x.getLyqValue()).limit(5000).collect(Collectors.toList());
-        List<Type2Vo> type2VoListResult = type2VoListType.stream().sorted((x, y) -> y.getValue() - x.getValue()).limit(2000).collect(Collectors.toList());
-
+        List<LyqTable> listMaxResultDesc = listMaxDesc.stream().sorted((x, y) -> y.getLyqValue() - x.getLyqValue()).limit(5000).collect(Collectors.toList());
+        List<Type2Vo> type2VoListResultDesc = type2VoListTypeDesc.stream().sorted((x, y) -> y.getValue() - x.getValue()).limit(2000).collect(Collectors.toList());
+        List<LyqTable> listMaxResultAsc = listMaxAsc.stream().sorted((x, y) -> y.getLyqValue() - x.getLyqValue()).limit(5000).collect(Collectors.toList());
+        List<Type2Vo> type2VoListResultAsc = type2VoListTypeAsc.stream().sorted((x, y) -> y.getValue() - x.getValue()).limit(2000).collect(Collectors.toList());
         /**
          * 准备下载
          */
         log.info("准备开始下载模板");
-        HSSFWorkbook workbook = copyDownMax(listMaxResult, type2VoListResult, dateNum);
+        HSSFWorkbook workbook = new HSSFWorkbook();//1.在内存中操作excel文件
+        workbook = copyDownMax(workbook ,listMaxResultDesc, type2VoListResultDesc, dateNum);
+        workbook = copyDownMax(workbook ,listMaxResultAsc, type2VoListResultAsc, dateNum);
         //5.创建文件名
         String fileName = dateNum + ".xls";
         log.info(fileName);
@@ -122,8 +146,13 @@ public class BTotalController {
      * @param type2VoListType
      * @return
      */
-    public List<Type2Vo> setLyqDates(List<Type2Vo> type2VoListType){
-        List<LyqTable> lyqTables = dataMap.get(0);
+    public List<Type2Vo> setLyqDates(List<Type2Vo> type2VoListType, Way way){
+        List<LyqTable> lyqTables;
+        if (Way.DESC.equals(way)) {
+            lyqTables = dataMap.get(0);
+        } else {
+            lyqTables = ascDataMap.get(0);
+        }
         lyqTables.sort((x, y) -> x.getLyqSeq()-y.getLyqSeq());
         List<Type2Vo> collect = type2VoListType.stream().map(x -> {
             Integer key = lyqTables.get(x.getSeq()-1).getLyqKey();
@@ -143,10 +172,9 @@ public class BTotalController {
      * @param dateNum
      * @throws Exception
      */
-    public HSSFWorkbook copyDownMax(List<LyqTable> listMax,
+    public HSSFWorkbook copyDownMax(HSSFWorkbook workbook, List<LyqTable> listMax,
                                     List<Type2Vo> type2VoListType, String dateNum) throws Exception {
         //操作list进行下载  日期号  组  key value
-        HSSFWorkbook workbook = new HSSFWorkbook();//1.在内存中操作excel文件
         HSSFSheet sheet = workbook.createSheet();//2.创建工作谱
         HSSFRow row = sheet.createRow(0);
         row.createCell(0).setCellValue("组号");
@@ -258,49 +286,53 @@ public class BTotalController {
      * 需要知道前一组的情况
      *
      * @param copyList 前一组的list
+     * @param desc
      * @return 这一组的list
      */
-    public List<LyqTable> copySort(List<LyqTable> copyList, Integer gruop) {
-        //long time1 = System.currentTimeMillis();
+    public List<LyqTable> copySort(List<LyqTable> copyList, Integer gruop,
+                                   Map<Integer, List<LyqTable>> map, Way way) {
         //1.获取数据并且按照seq排序
-        List<LyqTable> listgroupbySeq = dataMap.get(gruop);
+        List<LyqTable> listgroupbySeq = map.get(gruop);
         listgroupbySeq.sort((x, y) -> x.getSeq() - y.getSeq());
-        //long time2 = System.currentTimeMillis();
-        //print("查询一组数据,并排序", time1, time2);
         //2.把key 复给 下一组 带上0组的seq
         for (int i = 0; i < groupRow; i++) {
-            if (listgroupbySeq.get(i).getSeq() != i + 1) {
-                throw new RuntimeException("顺序不一致");
-            }
             listgroupbySeq.get(i).setLyqKey(copyList.get(i).getLyqKey()); //把上一组的key给这一组
             listgroupbySeq.get(i).setLyqSeq(copyList.get(i).getLyqSeq()); //把第零组的序列付给每一组
         }
-        //long time3 = System.currentTimeMillis();
-        //print("赋值", time2, time3);
         //3.逆向排序
-        listgroupbySeq.sort((x, y) -> y.getLyqValue() - x.getLyqValue());
-        //long time4 = System.currentTimeMillis();
-        //print("再次查询一组用时", time1, time4);
+        if (Way.DESC.equals(way)) {
+            listgroupbySeq.sort((x, y) -> y.getLyqValue() - x.getLyqValue());
+        } else {
+            listgroupbySeq.sort((x, y) -> x.getLyqValue() - y.getLyqValue());
+        }
         return listgroupbySeq;
     }
 
     /**
      * 9.1 copy的初始化操作
      */
-    public List<LyqTable> copyStart(List<Integer> anInt) {
-        List<LyqTable> listgroupbySeq = dataMap.get(0);
-        listgroupbySeq.sort((x, y) -> x.getSeq() - y.getSeq());
-        //模拟Excel获取3000个数据 并且赋值
-        for (int i = 0; i < groupRow; i++) {
-            //上面已经排序过了 不需要判断了
-            /*if (listgroupbySeq.get(i).getSeq() != i + 1) {
-                throw new RuntimeException("顺序不一致");
-            }*/
-            listgroupbySeq.get(i).setLyqKey(anInt.get(i)); //把上一组的key给这一组
+    public List<LyqTable> copyStart(List<Integer> anInt, Way way) {
+        if (Way.DESC.equals(way)) {
+            List<LyqTable> listgroupbySeq = dataMap.get(0);
+            listgroupbySeq.sort((x, y) -> x.getSeq() - y.getSeq());
+            //模拟Excel获取3000个数据 并且赋值
+            for (int i = 0; i < groupRow; i++) {
+                listgroupbySeq.get(i).setLyqKey(anInt.get(i)); //把上一组的key给这一组
+            }
+            //变量排序
+            listgroupbySeq.sort((x, y) -> y.getLyqValue() - x.getLyqValue());
+            return listgroupbySeq;
+        } else {
+            List<LyqTable> listgroupbySeq = ascDataMap.get(0);
+            listgroupbySeq.sort((x, y) -> x.getSeq() - y.getSeq());
+            //模拟Excel获取3000个数据 并且赋值
+            for (int i = 0; i < groupRow; i++) {
+                listgroupbySeq.get(i).setLyqKey(anInt.get(i)); //把上一组的key给这一组
+            }
+            //变量排序
+            listgroupbySeq.sort((x, y) -> x.getLyqValue() - y.getLyqValue());
+            return listgroupbySeq;
         }
-        //变量排序
-        listgroupbySeq.sort((x, y) -> y.getLyqValue() - x.getLyqValue());
-        return listgroupbySeq;
     }
 
     /**
@@ -343,8 +375,12 @@ public class BTotalController {
     @RequestMapping("/upload")
     private CommonResponse getIntByFile(MultipartFile file) throws IOException, DataCheckException {
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
+        /*第一步 解析上传的文件*/
         mainUtils.resolver1(workbook);
         mainUtils.resolver2(workbook);
+        /*第二步 分析的第一步*/
+        analyzeService.sept1();
+        /*第三步 升序的和降序的进行加一和归零的操作*/
         // ----> 上传数据
         LyqDate lyqDate = new LyqDate();
         lyqDate.setDateNum(appContent.getUpDateNum());
@@ -411,23 +447,27 @@ public class BTotalController {
             return CommonResponse.fail("期号重复了！！！");
         }
         //把所有的数据改为0 其他的++  然后把日期号存入数据库
-        updateToZore(ids.trim());
+        long time1 = System.currentTimeMillis();
+        updateToZore(ids.trim(), dataMap);
+        updateToZore(ids.trim(), ascDataMap);
         lyqDateList.add(lyqDate);
+        long time2 = System.currentTimeMillis();
+        print("更新操作（归零和加一）用时：", time1, time2);
         //lyqDate.insert();
         return CommonResponse.success();
     }
 
-    public void updateToZore(String trim) {
+    public void updateToZore(String trim, Map<Integer, List<LyqTable>> data) {
         //变为0 array
         String[] split = trim.split(",");
         Integer[] ids = new Integer[split.length];
         for (int i = 0; i < split.length; i++) {
             ids[i] = Integer.valueOf(split[i].trim());
         }
-        long time1 = System.currentTimeMillis();
-        Iterator<Integer> iterator = dataMap.keySet().iterator();
+
+        Iterator<Integer> iterator = data.keySet().iterator();
         iterator.forEachRemaining(group -> {
-            List<LyqTable> lyqTables = dataMap.get(group);
+            List<LyqTable> lyqTables = data.get(group);
             List<LyqTable> collect = lyqTables.stream()
                     .map(table -> {
                         if (Arrays.asList(ids).contains(table.getLyqKey()))
@@ -436,11 +476,8 @@ public class BTotalController {
                             table.setLyqValue(table.getLyqValue() + 1);
                         return table;
                     }).collect(Collectors.toList());
-            dataMap.put(group, collect);
+            data.put(group, collect);
         });
-        //Integer row1 = lyqTableMapper.updateToZore(ids);
-        long time2 = System.currentTimeMillis();
-        print("更新操作（归零和加一）用时：", time1, time2);
     }
 
     /**
@@ -765,6 +802,9 @@ public class BTotalController {
 
     @Resource
     private AppContent appContent;
+
+    @Resource
+    private AnalyzeService analyzeService;
 
     @PostConstruct
     public void init() {

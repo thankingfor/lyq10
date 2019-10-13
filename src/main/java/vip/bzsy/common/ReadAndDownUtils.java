@@ -1,8 +1,6 @@
 package vip.bzsy.common;
 
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import vip.bzsy.model.*;
 
