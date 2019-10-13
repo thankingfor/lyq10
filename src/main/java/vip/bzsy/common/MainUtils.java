@@ -56,11 +56,22 @@ public class MainUtils {
         HSSFRow row = sheet.getRow(1);
         String ids = "";
         List<Integer> idsList = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 14; i <= 18; i++) {
             String cellStringValue = CommonUtils.getCellStringValue(row.getCell(i)).trim();
             log.info(cellStringValue);
             if (CommonUtils.isNotEmpty(cellStringValue)) {
-                Integer num = Integer.valueOf(cellStringValue.substring(0, 1));
+                Integer num = Integer.valueOf(cellStringValue.substring(0, cellStringValue.length() - 2));
+                if (i == 14) {
+                    num = num % 2 == 0 ? 0 : 1;
+                } else if (i == 15) {
+                    num = num % 2 == 0 ? 2 : 3;
+                } else if (i == 16) {
+                    num = num % 2 == 0 ? 4 : 5;
+                } else if (i == 17) {
+                    num = num % 2 == 0 ? 6 : 7;
+                } else if (i == 18) {
+                    num = num % 2 == 0 ? 8 : 9;
+                }
                 idsList.add(num);
                 if (ids == "")
                     ids = num + "";
@@ -95,14 +106,13 @@ public class MainUtils {
         log.info("解析完毕上传的数据" + listant.toString());
     }
 
-    public CommonResponse readFile() {
-        CommonResponse read = downUtils.read();
+    public void readFile() {
+        downUtils.read();
         // 反序列化
         String lyqDateListStr = appContent.getLyqDateListStr();
         appContent.setLyqDateList(getDateList(lyqDateListStr));
         getData(appContent.getDescArray(), dataMap);
         getData(appContent.getAscArray(), ascDataMap);
-        return read;
     }
 
     private void getData(String[] arrays, Map<Integer, List<LyqTable>> map) {
@@ -119,7 +129,7 @@ public class MainUtils {
     /**
      * 下载方法
      */
-    public CommonResponse downFile() {
+    public void downFile() {
         // 1. 日期对象
         String dataStr = getDateListStr(appContent.getLyqDateList());
         appContent.setLyqDateListStr(dataStr);
@@ -127,7 +137,7 @@ public class MainUtils {
         appContent.setDescArray(mapToStrArr(dataMap));
         appContent.setAscArray(mapToStrArr(ascDataMap));
         // 下载
-        return downUtils.down();
+        downUtils.down();
     }
 
     private String[] mapToStrArr(Map<Integer, List<LyqTable>> map) {

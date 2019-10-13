@@ -21,10 +21,9 @@ public class ReadAndDownUtils {
     @Resource
     private AppContent appContent;
 
-    public CommonResponse down() {
-        long time3 = System.currentTimeMillis();
+    public void down() {
         if (appContent.getDataMap().size() == 0) {
-            return CommonResponse.fail("内存不存在！先初始化数据 或者 读取系统文件");
+            throw new RuntimeException("内存不存在！先初始化数据 或者 读取系统文件");
         }
         File file = new File(appContent.getDataPath());
         if (!file.exists()) {
@@ -38,16 +37,12 @@ public class ReadAndDownUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        long time4 = System.currentTimeMillis();
-        return CommonResponse.success("一共消耗了" + (time4 - time3) / 1000 + "秒");
+
     }
 
-    public CommonResponse read() {
-
+    public void read() {
         Map<Integer, List<LyqTable>> dataMap = appContent.getDataMap();
         dataMap.clear();
-
-        long time3 = System.currentTimeMillis();
         //如果日期数据存在就加载
         if (new File(appContent.getDataPath()).exists()) {
             try (ObjectInputStream oos = new ObjectInputStream(new FileInputStream(appContent.getDataPathData()))) {
@@ -58,9 +53,6 @@ public class ReadAndDownUtils {
             }
             log.info("日期对象加载成功！！！");
         }
-        long time4 = System.currentTimeMillis();
-        log.info("一共用时" + (time4 - time3) / 1000 + "秒");
-        return CommonResponse.success("一共用时" + (time4 - time3) / 1000 + "秒");
     }
 
     private void copy(AppContent appContent2) {
