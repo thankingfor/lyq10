@@ -4,10 +4,7 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author ：李延富
@@ -58,6 +55,11 @@ public class AppContent implements Serializable {
      */
     private transient Map<Integer, List<LyqTable>> AscDataMap = new HashMap<>();
     private String[] AscArray;
+
+    /**
+     * 分析的主要数据
+     */
+    public List<LyqAnalyze> anzList = new LinkedList<>();
 
     private transient String dataPath = "D:/lyq10";
     private transient String dataPathData = "D:/lyq10/data";

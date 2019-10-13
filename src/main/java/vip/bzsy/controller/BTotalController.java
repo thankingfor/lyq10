@@ -7,12 +7,14 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import vip.bzsy.common.CommonResponse;
 import vip.bzsy.common.CommonUtils;
 import vip.bzsy.common.DataCheckException;
 import vip.bzsy.common.MainUtils;
+import vip.bzsy.enums.Way;
 import vip.bzsy.model.*;
 
 import javax.annotation.PostConstruct;
@@ -399,7 +401,7 @@ public class BTotalController {
     @ResponseBody
     @RequestMapping(value = "/replace")
     public CommonResponse replace(LyqDate lyqDate) throws DataCheckException {
-        if (checkMap().getCode() == 0) {
+        if (checkMap(dataMap).getCode() == 0) {
             throw new DataCheckException();
         }
         lyqDate.setDateNum(lyqDate.getDateNum().trim());
@@ -472,29 +474,36 @@ public class BTotalController {
 
     /**
      * 4.查询内存中的dataMap
-     *
-     * @param page
-     * @param rows
-     * @return
      */
     @ResponseBody
     @RequestMapping(value = "/copy/list")
-    public Map<String, Object> copylist(Integer page, Integer rows) throws DataCheckException {
-        if (checkMap().getCode() == 0) {
+    public Map<String, Object> copylist(Integer page, Integer rows,
+                                        @RequestParam(value = "way", defaultValue = "DESC") Way way) throws DataCheckException {
+        Map<Integer, List<LyqTable>> dataMaps = getWay(way);
+        if (checkMap(dataMaps).getCode() == 0) {
             log.info("内存没有数据，请添加数据...");
             map.clear();
             map.put("rows", null);
             map.put("total", 0);
             return map;
         }
-        List<LyqTable> lyqTables = dataMap.get(page - 1);
+        List<LyqTable> lyqTables = dataMaps.get(page - 1);
         List<LyqTable> collect = lyqTables.stream()
                 .sorted((x, y) -> x.getSeq() - y.getSeq())
                 .limit(rows).collect(Collectors.toList());
         map.clear();
         map.put("rows", collect);
-        map.put("total", dataMap.size() * rows);
+        map.put("total", dataMaps.size() * rows);
         return map;
+    }
+
+    private Map<Integer, List<LyqTable>> getWay(Way way) {
+        if (Way.ASC.equals(way)) {
+            return dataMap;
+        } else if (Way.DESC.equals(way)) {
+            return ascDataMap;
+        }
+        return null;
     }
 
 
@@ -510,9 +519,20 @@ public class BTotalController {
         long time1 = System.currentTimeMillis();
         for (int i = 0; i < groupInt; i++) {
             List<LyqTable> init3000 = getInit3000(i);
+            List<LyqTable> init3000Asc = getInit3000(i);
             dataMap.put(i, init3000);
+            ascDataMap.put(i, init3000Asc);
         }
         long time2 = System.currentTimeMillis();
+
+        int maxGroupAnz = groupInt / anzGroupNum;
+        for (int i = 0; i < maxGroupAnz; i ++) {
+            LyqAnalyze analyze = new LyqAnalyze(i + 1,
+                    0, 0, 0, 0,
+                    0, 0, 0, 0,
+                    0, 0);
+            anzList.add(analyze);
+        }
         print(dataMap.size()+"组数据初始化完成，添加到内存总耗时：", time1, time2);
         return CommonResponse.success();
     }
@@ -523,7 +543,6 @@ public class BTotalController {
         for (int i = 0; i < groupRow; i++) {
             LyqTable lyqTable = new LyqTable();
             lyqTable.setSeq(i + 1);
-            //lyqTable.setLyqKey(random.nextInt(10));i
             lyqTable.setLyqKey(i);
             lyqTable.setLyqSeq(i + 1);
             lyqTable.setLyqGroup(group);
@@ -538,11 +557,11 @@ public class BTotalController {
      */
     @ResponseBody
     @RequestMapping(value = "/check")
-    private CommonResponse checkMap() {
-        if (dataMap.size() == groupInt) {
+    private CommonResponse checkMap(Map<Integer, List<LyqTable>> dataMaps) {
+        if (dataMaps.size() == groupInt) {
             return CommonResponse.success("数据合法");
         }
-        log.info(dataMap.size()+"组检验不足"+groupInt+"组");
+        log.info(dataMaps.size()+"组检验不足"+groupInt+"组");
         return CommonResponse.fail("数据不合法");
     }
 
@@ -693,6 +712,7 @@ public class BTotalController {
         dataMap = appContent.getDataMap();
         ascDataMap = appContent.getAscDataMap();
         lyqDateList = appContent.getLyqDateList();
+        anzList = appContent.getAnzList();
     }
 
     /*多少组  300W 多1 默认整万 + 1 个数*/
@@ -708,6 +728,7 @@ public class BTotalController {
     public Map<Integer, List<LyqTable>> ascDataMap;
     // 日期list
     public List<LyqDate> lyqDateList;
+    public List<LyqAnalyze> anzList;
 
     // 负责返回数据用的
     private Map<String, Object> map = new HashMap<>();
@@ -715,5 +736,5 @@ public class BTotalController {
     /**
      * 随机对象
      */
-    public static Random random = new Random();
+    private Random random = new Random();
 }
