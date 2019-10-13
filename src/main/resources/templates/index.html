@@ -14,35 +14,18 @@
     <script th:src="@{/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/bootstrap-table.js}"></script>
     <script th:src="@{/js/bootstrap-table-zh-CN.js}"></script>
-
     <script th:src="@{/js/fileinput.js}"></script>
     <script th:src="@{/js/fileinput-zh.js}"></script>
     <script type="text/javascript">
         $(function () {
             table1show();
             table2show();
+            table3show();
+            table4show();
+            table5show();
             initFileInput("uploadFile")
             initFileInput("upload2File")
         })
-
-        /**
-         *    初始化fileinput控件（第一次初始化）
-         * @param ctrlName id
-         * @param uploadUrl 路径
-         * @returns
-         */
-        function initFileInput(ctrlName) {
-            var control = $('#' + ctrlName);
-            control.fileinput({
-                language: 'zh', //设置语言
-                allowedFileExtensions: ['xls', 'xlsx'],//接收的文件后缀
-                showUpload: false, //是否显示上传按钮
-                showCaption: true,//是否显示标题
-                browseClass: "btn btn-primary", //按钮样式
-                showPreview: false, //是否显示预览
-                previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
-            });
-        }
 
         function table1show() {
             $('#table1').bootstrapTable({
@@ -126,10 +109,7 @@
                     title: '小组',
                     field: 'lyqGroup',
                     align: 'center',
-                    valign: 'middle',
-                    formatter: function (value, row, index) {
-                        return "第" + value + "组";
-                    }
+                    valign: 'middle'
                 }, {
                     title: '主键',
                     field: 'lyqKey',
@@ -148,6 +128,193 @@
                     width: 70
                 }]
             })
+        }
+
+        function table3show() {
+            $('#table3').bootstrapTable({
+                url: '[[@{/bt/copy/list}]]',
+                method: 'get',
+                dataType: 'json',
+                contentType: "application/x-www-form-urlencoded",
+                cache: false,
+                pagination: true,
+                singleSelect: false,
+                clickToSelect: true,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 10,                       //每页的记录行数（*）
+                pageList: [10],        //可供选择的每页的行数（*）
+                paginationVAlign: "top",
+                queryParams: function (params) {
+                    return {
+                        page: this.pageNumber,
+                        rows: this.pageSize,
+                        way:  "ASC"
+                    };
+                }, columns: [{
+                    checkbox: true
+                }, {
+                    title: 'ID',
+                    field: 'id',
+                    align: 'center',
+                    valign: 'middle',
+                    visible: false
+                }, {
+                    title: '序列',
+                    field: 'seq',
+                    align: 'center',
+                    valign: 'middle',
+                    width: 70
+                }, {
+                    title: '小组',
+                    field: 'lyqGroup',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '主键',
+                    field: 'lyqKey',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '变数',
+                    field: 'lyqValue',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '第零组序列',
+                    field: 'lyqSeq',
+                    align: 'center',
+                    valign: 'middle',
+                    width: 70
+                }]
+            })
+        }
+
+        function table4show() {
+            $('#table4').bootstrapTable({
+                url: '[[@{/bt/anz/list}]]',
+                method: 'get',
+                dataType: 'json',
+                contentType: "application/x-www-form-urlencoded",
+                cache: false,
+                pagination: true,
+                singleSelect: false,
+                clickToSelect: true,
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 20,                       //每页的记录行数（*）
+                pageList: [20],        //可供选择的每页的行数（*）
+                paginationVAlign: "top",
+                queryParams: function (params) {
+                    return {
+                        page: this.pageNumber,
+                        rows: this.pageSize
+                    };
+                },
+                columns: [{
+                    title: '排行榜',
+                    field: 'group',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析二-max',
+                    field: 'max2',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析二-min',
+                    field: 'min3',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析三-max',
+                    field: 'max3',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析三-min',
+                    field: 'min3',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析四',
+                    field: 'max4',
+                    align: 'center',
+                    valign: 'middle'
+                }]
+            })
+        }
+
+        function table5show() {
+            $('#table5').bootstrapTable({
+                url: '[[@{/bt/top/list}]]',
+                method: 'get',
+                dataType: 'json',
+                contentType: "application/x-www-form-urlencoded",
+                cache: false,
+                pagination: true,
+                singleSelect: false,
+                clickToSelect: true,
+                sidePagination: "server",
+                pageSize: 22,
+                paginationVAlign: "top",
+                queryParams: function (params) {
+                    return {
+                        page: this.pageNumber,
+                        rows: this.pageSize
+                    };
+                },
+                columns: [{
+                    title: '所有分析数据',
+                    field: 'group',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析二-max',
+                    field: 'max2',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析二-min',
+                    field: 'min3',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析三-max',
+                    field: 'max3',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析三-min',
+                    field: 'min3',
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    title: '分析四',
+                    field: 'max4',
+                    align: 'center',
+                    valign: 'middle'
+                }]
+            })
+        }
+
+        /**
+         *    初始化fileinput控件（第一次初始化）
+         * @param ctrlName id
+         * @param uploadUrl 路径
+         * @returns
+         */
+        function initFileInput(ctrlName) {
+            var control = $('#' + ctrlName);
+            control.fileinput({
+                language: 'zh', //设置语言
+                allowedFileExtensions: ['xls', 'xlsx'],//接收的文件后缀
+                showUpload: false, //是否显示上传按钮
+                showCaption: true,//是否显示标题
+                browseClass: "btn btn-primary", //按钮样式
+                showPreview: false, //是否显示预览
+                previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+            });
         }
 
         function initData() {
@@ -284,16 +451,6 @@
                 },
             })
         }
-        function lookData() {
-            $.ajax({
-                type: "get",
-                dataType: "json",
-                url: "[[@{/bt/printData}]]",
-                success: function (result) {
-                }, error: function (result) {
-                }
-            })
-        }
 
         function searchTables() {
             var num = $('#searchTable').val();
@@ -302,6 +459,14 @@
                 query:{
                     page: num,
                     rows: this.pageSize
+                }
+            })
+            $('#table3').bootstrapTable('refresh',{
+                pageNumber:num,
+                query:{
+                    page: num,
+                    rows: this.pageSize,
+                    way: "ASC"
                 }
             })
         }
@@ -336,7 +501,6 @@
             <button type="button" class="btn btn-default" style="margin-top: 100px" data-toggle="modal"
                     data-target="#initDataModel">初始化系统内存数据
             </button>
-            <!--<button type="button" class="btn btn-success m-2 p-2" onclick="lookData()">控制台查看数据</button>-->
         </div>
     </div>
     <div class="col-md-6">
@@ -361,13 +525,30 @@
             </div>
             <button type="button" class="btn btn-success" onclick="searchTables()" > 确认查询 </button>
         </form>
-        <table id="table2"></table>
+        <div class="row">
+            <div class="col-md-6">
+                <table id="table2"></table>
+            </div>
+            <div class="col-md-6">
+                <table id="table3"></table>
+            </div>
+        </div>
+
     </div>
     <div class="col-md-4">
         <div class="m-2">
             <h3>日期编号</h3>
             <table id="table1" ></table>
         </div>
+    </div>
+</div>
+<h1>数据分析</h1>
+<div class="row">
+    <div class="col-md-6">
+        <table id="table5"></table>
+    </div>
+    <div class="col-md-6">
+        <table id="table4"></table>
     </div>
 </div>
 

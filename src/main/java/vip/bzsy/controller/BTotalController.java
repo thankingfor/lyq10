@@ -445,10 +445,6 @@ public class BTotalController {
 
     /**
      * 3.查询日期list
-     *
-     * @param page
-     * @param rows
-     * @return
      */
     @ResponseBody
     @RequestMapping(value = "/replace/list")
@@ -469,6 +465,67 @@ public class BTotalController {
         map.clear();
         map.put("rows", collect);
         map.put("total", lyqDateList.size());
+        return map;
+    }
+
+    /**
+     * 查询分析结果
+     */
+    @ResponseBody
+    @RequestMapping(value = "/anz/list")
+    public Map<String, Object> anzSearch(Integer page, Integer rows) {
+        if (anzList.size() == 0) {
+            log.info("内存没有数据，请添加数据...");
+            map.clear();
+            map.put("rows", null);
+            map.put("total", 0);
+            return map;
+        }
+        /**
+         * 流的排序分页操作
+         */
+        List<LyqAnalyzeVo> collect = anzList.stream()
+                .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
+                .map(analyze -> LyqAnalyzeVo.toVo(analyze, "第"+analyze.getGroup()+"组"))
+                .skip((page - 1) * rows).limit(rows).parallel().collect(Collectors.toList());
+        map.clear();
+        map.put("rows", collect);
+        map.put("total", anzList.size());
+        return map;
+    }
+
+    /**
+     * 查询分析结果
+     */
+    @ResponseBody
+    @RequestMapping(value = "/top/list")
+    public Map<String, Object> topSearch() {
+        if (anzList.size() == 0) {
+            log.info("内存没有数据，请添加数据...");
+            map.clear();
+            map.put("rows", null);
+            map.put("total", 0);
+            return map;
+        }
+        /**
+         * 流的排序分页操作
+         */
+        List<LyqAnalyzeVo> ret = new LinkedList<>();
+        List<LyqAnalyzeVo> maxRetList = currentAnzMaxTop.stream()
+                .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
+                .map(analyze -> LyqAnalyzeVo.toVo(analyze, "当前最大榜-第"+analyze.getGroup()+"名"))
+                .collect(Collectors.toList());
+        List<LyqAnalyzeVo> minRetList = currentAnzMaxTop.stream()
+                .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
+                .map(analyze -> LyqAnalyzeVo.toVo(analyze, "当前最小榜-第"+analyze.getGroup()+"名"))
+                .collect(Collectors.toList());
+        ret.add(LyqAnalyzeVo.toVo(maxAnalyze, "最大"));
+        ret.add(LyqAnalyzeVo.toVo(minAnalyze, "最小"));
+        ret.addAll(maxRetList);
+        ret.addAll(minRetList);
+        map.clear();
+        map.put("rows", ret);
+        map.put("total", 22);
         return map;
     }
 
@@ -527,11 +584,17 @@ public class BTotalController {
 
         int maxGroupAnz = groupInt / anzGroupNum;
         for (int i = 0; i < maxGroupAnz; i ++) {
-            LyqAnalyze analyze = new LyqAnalyze(i + 1,
-                    0, 0, 0, 0,
-                    0, 0, 0, 0,
-                    0, 0);
+            LyqAnalyze analyze = LyqAnalyze.getNewObj(i + 1);
             anzList.add(analyze);
+        }
+
+        maxAnalyze = LyqAnalyze.getNewObj(0);
+        minAnalyze = LyqAnalyze.getNewObj(0);
+        maxMinAnalyze.add(maxAnalyze);
+        maxMinAnalyze.add(minAnalyze);
+        for (int i = 1; i <= 10; i ++) {
+            currentAnzMaxTop.add(LyqAnalyze.getNewObj(i));
+            currentAnzMinTop.add(LyqAnalyze.getNewObj(i));
         }
         print(dataMap.size()+"组数据初始化完成，添加到内存总耗时：", time1, time2);
         return CommonResponse.success();
@@ -661,7 +724,7 @@ public class BTotalController {
     @RequestMapping(value = "/get/obj")
     public CommonResponse getobj() {
         CommonResponse commonResponse = mainUtils.readFile();
-        dataMap = appContent.getDataMap();
+        init();
         return commonResponse;
     }
 
@@ -713,6 +776,13 @@ public class BTotalController {
         ascDataMap = appContent.getAscDataMap();
         lyqDateList = appContent.getLyqDateList();
         anzList = appContent.getAnzList();
+        maxMinAnalyze = appContent.getMaxMinAnalyze();
+        if (maxMinAnalyze != null && maxMinAnalyze.size() == 2) {
+            maxAnalyze = maxMinAnalyze.get(0);
+            minAnalyze = maxMinAnalyze.get(1);
+        }
+        currentAnzMaxTop = appContent.getCurrentAnzMaxTop();
+        currentAnzMinTop = appContent.getCurrentAnzMinTop();
     }
 
     /*多少组  300W 多1 默认整万 + 1 个数*/
@@ -728,7 +798,13 @@ public class BTotalController {
     public Map<Integer, List<LyqTable>> ascDataMap;
     // 日期list
     public List<LyqDate> lyqDateList;
+    // 分析数据
+    public List<LyqAnalyze> maxMinAnalyze;
     public List<LyqAnalyze> anzList;
+    public LyqAnalyze maxAnalyze;
+    public LyqAnalyze minAnalyze;
+    public List<LyqAnalyze> currentAnzMaxTop;
+    public List<LyqAnalyze> currentAnzMinTop;
 
     // 负责返回数据用的
     private Map<String, Object> map = new HashMap<>();

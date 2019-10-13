@@ -100,18 +100,20 @@ public class MainUtils {
         // 反序列化
         String lyqDateListStr = appContent.getLyqDateListStr();
         appContent.setLyqDateList(getDateList(lyqDateListStr));
+        getData(appContent.getDescArray(), dataMap);
+        getData(appContent.getAscArray(), ascDataMap);
+        return read;
+    }
 
-        Map<Integer, List<LyqTable>> dataMap = appContent.getDataMap();
-        String[] descArray = appContent.getDescArray();
+    private void getData(String[] arrays, Map<Integer, List<LyqTable>> map) {
         Integer groupNum = 0;
-        for (String group: descArray) {
+        for (String group: arrays) {
             String[] gs = group.split(separator3);
             for (String g: gs) {
                 List<LyqTable> list = getList(g);
-                dataMap.put(groupNum ++, list);
+                map.put(groupNum ++, list);
             }
         }
-        return read;
     }
 
     /**
@@ -122,17 +124,21 @@ public class MainUtils {
         String dataStr = getDateListStr(appContent.getLyqDateList());
         appContent.setLyqDateListStr(dataStr);
         // 2. 主要数据
-        appContent.setDataMap(dataMap);
+        appContent.setDescArray(mapToStrArr(dataMap));
+        appContent.setAscArray(mapToStrArr(ascDataMap));
+        // 下载
+        return downUtils.down();
+    }
+
+    private String[] mapToStrArr(Map<Integer, List<LyqTable>> map) {
         Integer totalNum = totalCount / splIndex + 1;
         // 默认一万个数一组
         String[] arr = new String[totalNum];
-        arr[0] = getListStr(dataMap.get(0));
+        arr[0] = getListStr(map.get(0));
         for (int i = 1; i < totalNum; i++) {
             arr[i] = getArrStr(i * splIndex);
         }
-        appContent.setDescArray(arr);
-        // 下载
-        return downUtils.down();
+        return arr;
     }
 
     private String getDateListStr(List<LyqDate> lyqDateList) {

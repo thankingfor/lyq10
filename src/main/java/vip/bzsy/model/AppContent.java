@@ -21,13 +21,13 @@ public class AppContent implements Serializable {
      * 定义
      */
     /*多少组  300W 多1 默认整万 + 1 个数*/
-    public Integer groupInt = 300001;
+    public transient Integer groupInt = 300001;
     /*多少条数据 10*/
-    public Integer groupRow = 10;
+    public transient Integer groupRow = 10;
     /*多少组在分一组 21*/
-    public Integer groupNum = 21;
+    public transient Integer groupNum = 21;
     /*分析数据为多少一组 v2*/
-    public Integer anzGroupNum = 19;
+    public transient Integer anzGroupNum = 19;
 
     /**
      * 存放上传的数据 10个中的数字
@@ -60,6 +60,11 @@ public class AppContent implements Serializable {
      * 分析的主要数据
      */
     public List<LyqAnalyze> anzList = new LinkedList<>();
+    public List<LyqAnalyze> maxMinAnalyze = new LinkedList<>();
+    public transient LyqAnalyze maxAnalyze = new LyqAnalyze();
+    public transient LyqAnalyze minAnalyze = new LyqAnalyze();
+    public List<LyqAnalyze> currentAnzMaxTop = new LinkedList<>();
+    public List<LyqAnalyze> currentAnzMinTop = new LinkedList<>();
 
     private transient String dataPath = "D:/lyq10";
     private transient String dataPathData = "D:/lyq10/data";

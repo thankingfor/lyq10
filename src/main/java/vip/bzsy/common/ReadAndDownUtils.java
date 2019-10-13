@@ -66,8 +66,19 @@ public class ReadAndDownUtils {
     }
 
     private void copy(AppContent appContent2) {
+        // 10个数字
+        appContent.setUpDateNum(appContent2.getUpDateNum());
+        appContent.setUpNums(appContent2.getUpNums());
+        appContent.setUpNumsStr(appContent2.getUpNumsStr());
+        appContent.setUpList10(appContent2.getUpList10());
+        // 重要数据
         appContent.setLyqDateListStr(appContent2.getLyqDateListStr());
         appContent.setDescArray(appContent2.getDescArray());
         appContent.setAscArray(appContent2.getAscArray());
+        // 分析数据
+        appContent.setAnzList(appContent2.getAnzList());
+        appContent.setMaxMinAnalyze(appContent2.getMaxMinAnalyze());
+        appContent.setCurrentAnzMaxTop(appContent2.getCurrentAnzMaxTop());
+        appContent.setCurrentAnzMinTop(appContent2.getCurrentAnzMinTop());
     }
 }
