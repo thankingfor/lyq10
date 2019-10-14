@@ -41,8 +41,7 @@ public class AppContent implements Serializable {
     /**
      * 日期对象
      */
-    private transient List<LyqDate> lyqDateList = new ArrayList<>();
-    private String lyqDateListStr;
+    private List<LyqDate> lyqDateList = new ArrayList<>();
 
     /**
      * 降序的主要数组
@@ -66,7 +65,7 @@ public class AppContent implements Serializable {
     public List<LyqAnalyze> currentAnzMaxTop = new LinkedList<>();
     public List<LyqAnalyze> currentAnzMinTop = new LinkedList<>();
 
-    private transient String dataPath = "D:/lyq10";
-    private transient String dataPathData = "D:/lyq10/data";
+    private transient String dataPath = "D:/lyq10/data3w";
+    private transient String dataPathData = "D:/lyq10/data3w/data";
 
 }

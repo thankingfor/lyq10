@@ -109,8 +109,6 @@ public class MainUtils {
     public void readFile() {
         downUtils.read();
         // 反序列化
-        String lyqDateListStr = appContent.getLyqDateListStr();
-        appContent.setLyqDateList(getDateList(lyqDateListStr));
         getData(appContent.getDescArray(), dataMap);
         getData(appContent.getAscArray(), ascDataMap);
     }
@@ -130,10 +128,7 @@ public class MainUtils {
      * 下载方法
      */
     public void downFile() {
-        // 1. 日期对象
-        String dataStr = getDateListStr(appContent.getLyqDateList());
-        appContent.setLyqDateListStr(dataStr);
-        // 2. 主要数据
+        // 主要数据
         appContent.setDescArray(mapToStrArr(dataMap));
         appContent.setAscArray(mapToStrArr(ascDataMap));
         // 下载
@@ -149,32 +144,6 @@ public class MainUtils {
             arr[i] = getArrStr(i * splIndex);
         }
         return arr;
-    }
-
-    private String getDateListStr(List<LyqDate> lyqDateList) {
-        StringBuffer buffer = new StringBuffer();
-        for(LyqDate lyqDate: lyqDateList) {
-            buffer.append(lyqDate.getDateNum()).append(separator1)
-                    .append(lyqDate.getValue()).append(separator2);
-        }
-        return buffer.toString();
-    }
-
-    private List<LyqDate> getDateList(String dateStr) {
-        List<LyqDate> lyqDateList = new LinkedList<>();
-        if (dateStr == null || "".equals(dateStr)) {
-            return lyqDateList;
-        }
-        String[] objs = dateStr.split(separator2);
-        for (String obj : objs) {
-            String[] items = obj.split(separator1);
-            LyqDate lyqDate = new LyqDate();
-            lyqDate.setDateNum(items[0]);
-            lyqDate.setValue(items[1]);
-            lyqDateList.add(lyqDate);
-        }
-
-        return lyqDateList;
     }
 
     /**

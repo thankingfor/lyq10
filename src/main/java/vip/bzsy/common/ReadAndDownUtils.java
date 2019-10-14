@@ -62,7 +62,7 @@ public class ReadAndDownUtils {
         appContent.setUpNumsStr(appContent2.getUpNumsStr());
         appContent.setUpList10(appContent2.getUpList10());
         // 重要数据
-        appContent.setLyqDateListStr(appContent2.getLyqDateListStr());
+        appContent.setLyqDateList(appContent2.getLyqDateList());
         appContent.setDescArray(appContent2.getDescArray());
         appContent.setAscArray(appContent2.getAscArray());
         // 分析数据
