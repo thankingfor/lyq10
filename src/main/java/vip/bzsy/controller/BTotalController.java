@@ -346,135 +346,7 @@ public class BTotalController {
         log.info("分析二完成");
         analyze4();
         log.info("分析四完成");
-        // 获取4个的最大值
-        anzList.sort((x,y) -> y.getMaxRet2() - x.getMaxRet2());
-        for (int i = 0; i < 10; i ++) {
-            currentAnzMaxTop.get(i).setMaxDesc2(anzList.get(i).getMaxDesc2());
-            currentAnzMaxTop.get(i).setMaxAsc2(anzList.get(i).getMaxAsc2());
-            currentAnzMaxTop.get(i).setMaxRet2(anzList.get(i).getMaxRet2());
-            if (i == 0) {
-                if (maxAnalyze.getMaxRet2() < currentAnzMaxTop.get(i).getMaxRet2()) {
-                    maxAnalyze.setMaxDesc2(anzList.get(i).getMaxDesc2());
-                    maxAnalyze.setMaxAsc2(anzList.get(i).getMaxAsc2());
-                    maxAnalyze.setMaxRet2(anzList.get(i).getMaxRet2());
-                }
-            }
-        }
-        for (int i = anzList.size() - 1, j = 0; i >= anzList.size() - 10; i --, j ++) {
-            currentAnzMinTop.get(j).setMaxDesc2(anzList.get(i).getMaxDesc2());
-            currentAnzMinTop.get(j).setMaxAsc2(anzList.get(i).getMaxAsc2());
-            currentAnzMinTop.get(j).setMaxRet2(anzList.get(i).getMaxRet2());
-            if (i == anzList.size() - 1) {
-                if (minAnalyze.getMaxRet2() > currentAnzMinTop.get(j).getMaxRet2()) {
-                    minAnalyze.setMaxDesc2(anzList.get(i).getMaxDesc2());
-                    minAnalyze.setMaxAsc2(anzList.get(i).getMaxAsc2());
-                    minAnalyze.setMaxRet2(anzList.get(i).getMaxRet2());
-                }
-            }
-        }
-
-        anzList.sort((x,y) -> x.getMinRet2() - y.getMinRet2());
-        for (int i = 0; i < 10; i ++) {
-            currentAnzMaxTop.get(i).setMinDesc2(anzList.get(i).getMinDesc2());
-            currentAnzMaxTop.get(i).setMinAsc2(anzList.get(i).getMinAsc2());
-            currentAnzMaxTop.get(i).setMinRet2(anzList.get(i).getMinRet2());
-            if (i == 0) {
-                if (maxAnalyze.getMinRet2() < currentAnzMaxTop.get(i).getMinRet2()) {
-                    maxAnalyze.setMinDesc2(anzList.get(i).getMinDesc2());
-                    maxAnalyze.setMinAsc2(anzList.get(i).getMinAsc2());
-                    maxAnalyze.setMinRet2(anzList.get(i).getMinRet2());
-                }
-            }
-        }
-        for (int i = anzList.size() - 1, j = 0; i >= anzList.size() - 10; i --, j ++) {
-            currentAnzMinTop.get(j).setMinDesc2(anzList.get(i).getMinDesc2());
-            currentAnzMinTop.get(j).setMinAsc2(anzList.get(i).getMinAsc2());
-            currentAnzMinTop.get(j).setMinRet2(anzList.get(i).getMinRet2());
-            if (i == anzList.size() - 1) {
-                if (minAnalyze.getMinRet2() > currentAnzMinTop.get(j).getMinRet2()) {
-                    minAnalyze.setMinDesc2(anzList.get(i).getMinDesc2());
-                    minAnalyze.setMinAsc2(anzList.get(i).getMinAsc2());
-                    minAnalyze.setMinRet2(anzList.get(i).getMinRet2());
-                }
-            }
-        }
-        anzList.sort((x,y) -> y.getMaxRet3() - x.getMaxRet3());
-        for (int i = 0; i < 10; i ++) {
-            currentAnzMaxTop.get(i).setMaxDesc3(anzList.get(i).getMaxDesc3());
-            currentAnzMaxTop.get(i).setMaxAsc3(anzList.get(i).getMaxAsc3());
-            currentAnzMaxTop.get(i).setMaxRet3(anzList.get(i).getMaxRet3());
-            if (i == 0) {
-                if (maxAnalyze.getMaxRet3() < currentAnzMaxTop.get(i).getMaxRet3()) {
-                    maxAnalyze.setMaxDesc3(anzList.get(i).getMaxDesc3());
-                    maxAnalyze.setMaxAsc3(anzList.get(i).getMaxAsc3());
-                    maxAnalyze.setMaxRet3(anzList.get(i).getMaxRet3());
-                }
-            }
-        }
-        for (int i = anzList.size() - 1, j = 0; i >= anzList.size() - 10; i --, j ++) {
-            currentAnzMinTop.get(j).setMaxDesc3(anzList.get(i).getMaxDesc3());
-            currentAnzMinTop.get(j).setMaxAsc3(anzList.get(i).getMaxAsc3());
-            currentAnzMinTop.get(j).setMaxRet3(anzList.get(i).getMaxRet3());
-            if (i == anzList.size() - 1) {
-                if (minAnalyze.getMaxRet3() > currentAnzMinTop.get(j).getMaxRet3()) {
-                    minAnalyze.setMaxDesc3(anzList.get(i).getMaxDesc3());
-                    minAnalyze.setMaxAsc3(anzList.get(i).getMaxAsc3());
-                    minAnalyze.setMaxRet3(anzList.get(i).getMaxRet3());
-                }
-            }
-        }
-        anzList.sort((x,y) -> x.getMinRet3() - y.getMinRet3());
-        for (int i = 0; i < 10; i ++) {
-            currentAnzMaxTop.get(i).setMinDesc3(anzList.get(i).getMinDesc3());
-            currentAnzMaxTop.get(i).setMinAsc3(anzList.get(i).getMinAsc3());
-            currentAnzMaxTop.get(i).setMinRet3(anzList.get(i).getMinRet3());
-            if (i == 0) {
-                if (maxAnalyze.getMinRet3() < currentAnzMaxTop.get(i).getMinRet3()) {
-                    maxAnalyze.setMinDesc3(anzList.get(i).getMinDesc3());
-                    maxAnalyze.setMinAsc3(anzList.get(i).getMinAsc3());
-                    maxAnalyze.setMinRet3(anzList.get(i).getMinRet3());
-                }
-            }
-        }
-        for (int i = anzList.size() - 1, j = 0; i >= anzList.size() - 10; i --, j ++) {
-            currentAnzMinTop.get(j).setMinDesc3(anzList.get(i).getMinDesc3());
-            currentAnzMinTop.get(j).setMinAsc3(anzList.get(i).getMinAsc3());
-            currentAnzMinTop.get(j).setMinRet3(anzList.get(i).getMinRet3());
-            if (i == anzList.size() - 1) {
-                if (minAnalyze.getMinRet3() > currentAnzMinTop.get(j).getMinRet3()) {
-                    minAnalyze.setMinDesc3(anzList.get(i).getMinDesc3());
-                    minAnalyze.setMinAsc3(anzList.get(i).getMinAsc3());
-                    minAnalyze.setMinRet3(anzList.get(i).getMinRet3());
-                }
-            }
-        }
-
-        anzList.sort((x,y) -> y.getRet4() - x.getRet4());
-        for (int i = 0; i < 10; i ++) {
-            currentAnzMaxTop.get(i).setDesc4(anzList.get(i).getDesc4());
-            currentAnzMaxTop.get(i).setAsc4(anzList.get(i).getAsc4());
-            currentAnzMaxTop.get(i).setRet4(anzList.get(i).getRet4());
-            if (i == 0) {
-                if (maxAnalyze.getRet4() < currentAnzMaxTop.get(i).getRet4()) {
-                    maxAnalyze.setDesc4(anzList.get(i).getDesc4());
-                    maxAnalyze.setAsc4(anzList.get(i).getAsc4());
-                    maxAnalyze.setRet4(anzList.get(i).getRet4());
-                }
-            }
-        }
-        for (int i = anzList.size() - 1, j = 0; i >= anzList.size() - 10; i --, j ++) {
-            currentAnzMinTop.get(j).setDesc4(anzList.get(i).getDesc4());
-            currentAnzMinTop.get(j).setAsc4(anzList.get(i).getAsc4());
-            currentAnzMinTop.get(j).setRet4(anzList.get(i).getRet4());
-            if (i == anzList.size() - 1) {
-                if (minAnalyze.getRet4() > currentAnzMinTop.get(j).getRet4()) {
-                    minAnalyze.setDesc4(anzList.get(i).getDesc4());
-                    minAnalyze.setAsc4(anzList.get(i).getAsc4());
-                    minAnalyze.setRet4(anzList.get(i).getRet4());
-                }
-            }
-        }
-        log.info("消息分析完毕");
+        analyzeService.sept2();
     }
 
     private void analyze4() {
@@ -760,7 +632,7 @@ public class BTotalController {
                 .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
                 .map(analyze -> LyqAnalyzeVo.toVo(analyze, "当前最大榜-第"+analyze.getGroup()+"名"))
                 .collect(Collectors.toList());
-        List<LyqAnalyzeVo> minRetList = currentAnzMaxTop.stream()
+        List<LyqAnalyzeVo> minRetList = currentAnzMinTop.stream()
                 .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
                 .map(analyze -> LyqAnalyzeVo.toVo(analyze, "当前最小榜-第"+analyze.getGroup()+"名"))
                 .collect(Collectors.toList());
