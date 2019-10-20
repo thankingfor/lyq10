@@ -55,4 +55,28 @@ public class LyqAnalyze implements Serializable {
                 0, 0,0,0, 0, 0,
                 0, 0,0);
     }
+
+    public static LyqAnalyze clone(LyqAnalyze lyqAnalyze) {
+        LyqAnalyze analyze = new LyqAnalyze();
+        analyze.setGroup(lyqAnalyze.getGroup());
+
+        analyze.setMaxDesc2(lyqAnalyze.getMaxDesc2());
+        analyze.setMaxAsc2(lyqAnalyze.getMaxAsc2());
+        analyze.setMinDesc2(lyqAnalyze.getMinDesc2());
+        analyze.setMinAsc2(lyqAnalyze.getMinAsc2());
+        analyze.setMaxRet2(lyqAnalyze.getMaxRet2());
+        analyze.setMinRet2(lyqAnalyze.getMinRet2());
+
+        analyze.setMaxDesc3(lyqAnalyze.getMaxDesc3());
+        analyze.setMaxAsc3(lyqAnalyze.getMaxAsc3());
+        analyze.setMinDesc3(lyqAnalyze.getMinDesc3());
+        analyze.setMinAsc3(lyqAnalyze.getMinAsc3());
+        analyze.setMaxRet3(lyqAnalyze.getMaxRet3());
+        analyze.setMinRet3(lyqAnalyze.getMinRet3());
+
+        analyze.setDesc4(lyqAnalyze.getDesc4());
+        analyze.setAsc4(lyqAnalyze.getAsc4());
+        analyze.setRet4(lyqAnalyze.getRet4());
+        return analyze;
+    }
 }

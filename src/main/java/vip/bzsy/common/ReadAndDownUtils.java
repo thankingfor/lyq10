@@ -68,6 +68,8 @@ public class ReadAndDownUtils {
         // 分析数据
         appContent.setAnzList(appContent2.getAnzList());
         appContent.setMaxMinAnalyze(appContent2.getMaxMinAnalyze());
+        appContent.setMaxAnalyze(appContent.getMaxMinAnalyze().get(0));
+        appContent.setMinAnalyze(appContent.getMaxMinAnalyze().get(1));
         appContent.setCurrentAnzMaxTop(appContent2.getCurrentAnzMaxTop());
         appContent.setCurrentAnzMinTop(appContent2.getCurrentAnzMinTop());
     }

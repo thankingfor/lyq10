@@ -21,7 +21,7 @@ public class AppContent implements Serializable {
      * 定义
      */
     /*多少组  300W 多1 默认整万 + 1 个数*/
-    public transient Integer groupInt = 30001;
+    public transient Integer groupInt = 1500001;
     /*多少条数据 10*/
     public transient Integer groupRow = 10;
     /*多少组在分一组 21*/

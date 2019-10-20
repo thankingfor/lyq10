@@ -6,7 +6,7 @@ import vip.bzsy.model.AppContent;
 import vip.bzsy.model.LyqAnalyze;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 public class AnalyzeService {
 
     @Resource
+    private BTotalController bTotalController;
+
+    @Resource
     private AppContent appContent;
 
     /**
@@ -30,38 +33,56 @@ public class AnalyzeService {
         for (LyqAnalyze analyze: anzList) {
             if (analyze.getMaxAsc2() == analyze.getMaxDesc2() && isInArr(analyze.getMaxAsc2())) {
                 analyze.setMaxRet2(analyze.getMaxRet2() + 1);
+            } else if (analyze.getMaxAsc2() == analyze.getMaxDesc2() && !isInArr(analyze.getMaxAsc2())){
+                analyze.setMaxRet2(analyze.getMaxRet2() - 1);
             } else {
-                analyze.setMaxRet2(1);
+                analyze.setMaxRet2(0);
             }
 
             if (analyze.getMinAsc2() == analyze.getMinDesc2() && isInArr(analyze.getMinAsc2())) {
+                analyze.setMinRet2(analyze.getMinRet2() + 1);
+            } else if (analyze.getMinAsc2() == analyze.getMinDesc2() && !isInArr(analyze.getMinAsc2())){
                 analyze.setMinRet2(analyze.getMinRet2() - 1);
             } else {
-                analyze.setMinRet2(-1);
+                analyze.setMinRet2(0);
             }
 
             if (analyze.getMaxAsc3() == analyze.getMaxDesc3() && isInArr(analyze.getMaxAsc3())) {
                 analyze.setMaxRet3(analyze.getMaxRet3() + 1);
+            } else if (analyze.getMaxAsc3() == analyze.getMaxDesc3() && !isInArr(analyze.getMaxAsc3())){
+                analyze.setMaxRet3(analyze.getMaxRet3() - 1);
             } else {
-                analyze.setMaxRet3(1);
+                analyze.setMaxRet3(0);
             }
 
             if (analyze.getMinAsc3() == analyze.getMinDesc3() && isInArr(analyze.getMinAsc3())) {
                 analyze.setMinRet3(analyze.getMinRet3() - 1);
+            } else if (analyze.getMinAsc3() == analyze.getMinDesc3() && !isInArr(analyze.getMinAsc3())){
+                analyze.setMinRet3(analyze.getMinRet3() - 1);
             } else {
-                analyze.setMinRet3(-1);
+                analyze.setMinRet3(0);
             }
 
             if (analyze.getDesc4() == analyze.getAsc4() && isInArr(analyze.getDesc4())) {
                 analyze.setRet4(analyze.getRet4() + 1);
+            } else if (analyze.getDesc4() == analyze.getAsc4() && !isInArr(analyze.getDesc4())){
+                analyze.setRet4(analyze.getRet4() - 1);
             } else {
-                analyze.setRet4(1);
+                analyze.setRet4(0);
             }
         }
     }
 
     private boolean isInArr(Integer num) {
         return appContent.getUpNums().contains(num);
+    }
+
+    private List<LyqAnalyze> clone(List<LyqAnalyze> list) {
+        List<LyqAnalyze> listAnz = new LinkedList<>();
+        for (LyqAnalyze analyze: list) {
+            listAnz.add(LyqAnalyze.clone(analyze));
+        }
+        return listAnz;
     }
 
     /**
@@ -76,7 +97,8 @@ public class AnalyzeService {
 
         // 获取4个的最大值
         // -------------------分析二 MAX -----------------------
-        List<LyqAnalyze> ret1 = anzList.stream()
+        List<LyqAnalyze> cloneRet1 = clone(anzList);
+        List<LyqAnalyze> ret1 = cloneRet1.stream()
                 .filter(analyze -> {
                     if (analyze.getMaxDesc2() == analyze.getMaxAsc2()){
                         return true;
@@ -113,14 +135,15 @@ public class AnalyzeService {
         }
         log.info("消息分析 分析二 MAX 完毕");
         // -------------------分析二 MIN -----------------------
-        List<LyqAnalyze> ret2 = anzList.stream()
+        List<LyqAnalyze> cloneRet2 = clone(anzList);
+        List<LyqAnalyze> ret2 = cloneRet2.stream()
                 .filter(analyze -> {
                     if (analyze.getMinDesc2() == analyze.getMinAsc2()){
                         return true;
                     }
                     return false;
                 })
-                .sorted((x,y) -> x.getMinRet2() - y.getMinRet2())
+                .sorted((x,y) -> y.getMinRet2() - x.getMinRet2())
                 .collect(Collectors.toList());
         for (int i = 0; i < 10 && i < ret2.size(); i ++) {
             currentAnzMaxTop.get(i).setMinDesc2(ret2.get(i).getMinDesc2());
@@ -150,7 +173,8 @@ public class AnalyzeService {
         }
         log.info("消息分析 分析二 MIN 完毕");
         // -------------------分析三 MAX -----------------------
-        List<LyqAnalyze> ret3 = anzList.stream()
+        List<LyqAnalyze> cloneRet3 = clone(anzList);
+        List<LyqAnalyze> ret3 = cloneRet3.stream()
                 .filter(analyze -> {
                     if (analyze.getMaxDesc3() == analyze.getMaxAsc3()){
                         return true;
@@ -187,14 +211,15 @@ public class AnalyzeService {
         }
         log.info("消息分析 分析三 MAX 完毕");
         // -------------------分析三 MIN -----------------------
-        List<LyqAnalyze> ret4 = anzList.stream()
+        List<LyqAnalyze> cloneRet4 = clone(anzList);
+        List<LyqAnalyze> ret4 = cloneRet4.stream()
                 .filter(analyze -> {
                     if (analyze.getMinDesc3() == analyze.getMinAsc3()){
                         return true;
                     }
                     return false;
                 })
-                .sorted((x,y) -> x.getMinRet3() - y.getMinRet3())
+                .sorted((x,y) -> y.getMinRet3() - x.getMinRet3())
                 .collect(Collectors.toList());
 
         for (int i = 0; i < 10 && i < ret4.size(); i ++) {
@@ -225,7 +250,8 @@ public class AnalyzeService {
         }
         log.info("消息分析 分析三 MIN 完毕");
         // -------------------分析四 MAX -----------------------
-        List<LyqAnalyze> ret5 = anzList.stream()
+        List<LyqAnalyze> cloneRet5 = clone(anzList);
+        List<LyqAnalyze> ret5 = cloneRet5.stream()
                 .filter(analyze -> {
                     if (analyze.getDesc4() == analyze.getAsc4()){
                         return true;

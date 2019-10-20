@@ -356,10 +356,10 @@ public class BTotalController {
     }
 
     private void analyze() {
-        analyze3();
-        log.info("分析三完成");
         analyze2();
         log.info("分析二完成");
+        analyze3();
+        log.info("分析三完成");
         analyze4();
         log.info("分析四完成");
         analyzeService.sept2();
@@ -374,8 +374,6 @@ public class BTotalController {
             for (; start < groupNum * appContent.getAnzGroupNum(); start++) {
                 List<LyqTable> lyqTablesDesc = clone(appContent.getDataMap().get(start));
                 List<LyqTable> lyqTablesAsc = clone(appContent.getAscDataMap().get(start));
-                lyqTablesDesc.sort((a, b) -> b.getLyqValue() - a.getLyqValue());
-                lyqTablesAsc.sort((a, b) -> b.getLyqValue() - a.getLyqValue());
 
                 LyqTable tableDesc0 = lyqTablesDesc.get(0);
                 LyqTable tableAsc0 = lyqTablesAsc.get(0);
@@ -411,9 +409,9 @@ public class BTotalController {
         Integer maxGroup = appContent.getGroupInt() / appContent.getAnzGroupNum();
         Integer start = 1;
         Integer groupNum = 1;
-        List<LyqTable> groupTablesDesc = new LinkedList<>();
-        List<LyqTable> groupTablesAsc = new LinkedList<>();
         for (; groupNum <= maxGroup; groupNum ++) {
+            List<LyqTable> groupTablesDesc = new LinkedList<>();
+            List<LyqTable> groupTablesAsc = new LinkedList<>();
             // 一大组
             for (; start < groupNum * appContent.getAnzGroupNum(); start ++) {
                 List<LyqTable> lyqTablesDesc = clone(appContent.getDataMap().get(start));
@@ -430,9 +428,6 @@ public class BTotalController {
             analyze.setMaxAsc3(groupTablesAsc.get(0).getLyqKey());
             analyze.setMinDesc3(groupTablesDesc.get(groupTablesDesc.size() - 1).getLyqKey());
             analyze.setMinAsc3(groupTablesAsc.get(groupTablesAsc.size() - 1).getLyqKey());
-            if (groupNum % 10 == 0) {
-                log.info("第"+groupNum+"大组");
-            }
         }
     }
 
@@ -618,9 +613,8 @@ public class BTotalController {
          * 流的排序分页操作
          */
         List<LyqAnalyzeVo> collect = appContent.getAnzList().stream()
-                .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
                 .map(analyze -> LyqAnalyzeVo.toVo(analyze, "第"+analyze.getGroup()+"组"))
-                .skip((page - 1) * rows).limit(rows).parallel().collect(Collectors.toList());
+                .skip((page - 1) * rows).limit(rows).collect(Collectors.toList());
         map.clear();
         map.put("rows", collect);
         map.put("total", appContent.getAnzList().size());
@@ -645,11 +639,9 @@ public class BTotalController {
          */
         List<LyqAnalyzeVo> ret = new LinkedList<>();
         List<LyqAnalyzeVo> maxRetList = appContent.getCurrentAnzMaxTop().stream()
-                .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
                 .map(analyze -> LyqAnalyzeVo.toVo(analyze, "当前最大榜-第"+analyze.getGroup()+"名"))
                 .collect(Collectors.toList());
         List<LyqAnalyzeVo> minRetList = appContent.getCurrentAnzMinTop().stream()
-                .sorted((x, y) -> x.getGroup().compareTo(y.getGroup()))
                 .map(analyze -> LyqAnalyzeVo.toVo(analyze, "当前最小榜-第"+analyze.getGroup()+"名"))
                 .collect(Collectors.toList());
         ret.add(LyqAnalyzeVo.toVo(appContent.getMaxAnalyze(), "最大"));
