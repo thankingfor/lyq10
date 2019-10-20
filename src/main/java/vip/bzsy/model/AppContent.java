@@ -21,7 +21,7 @@ public class AppContent implements Serializable {
      * 定义
      */
     /*多少组  300W 多1 默认整万 + 1 个数*/
-    public transient Integer groupInt = 1500001;
+    public transient Integer groupInt = 300001;
     /*多少条数据 10*/
     public transient Integer groupRow = 10;
     /*多少组在分一组 21*/
@@ -46,14 +46,12 @@ public class AppContent implements Serializable {
     /**
      * 降序的主要数组
      */
-    private transient Map<Integer, List<LyqTable>> dataMap = new HashMap<>();
-    private String[] DescArray;
+    private Map<Integer, List<LyqTable>> dataMap = new HashMap<>();
 
     /**
      * 升序的主要数组
      */
-    private transient Map<Integer, List<LyqTable>> AscDataMap = new HashMap<>();
-    private String[] AscArray;
+    private Map<Integer, List<LyqTable>> AscDataMap = new HashMap<>();
 
     /**
      * 分析的主要数据
@@ -65,7 +63,7 @@ public class AppContent implements Serializable {
     public List<LyqAnalyze> currentAnzMaxTop = new LinkedList<>();
     public List<LyqAnalyze> currentAnzMinTop = new LinkedList<>();
 
-    private transient String dataPath = "D:/lyq10/data3w";
-    private transient String dataPathData = "D:/lyq10/data3w/data";
+    private transient String dataPath = "D:/lyq10/data30w";
+    private transient String dataPathData = "D:/lyq10/data30w/data";
 
 }

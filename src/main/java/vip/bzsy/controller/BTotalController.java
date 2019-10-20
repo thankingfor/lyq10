@@ -837,7 +837,6 @@ public class BTotalController {
     @RequestMapping(value = "/down/obj")
     public CommonResponse dataMapdonwloadobj() {
         long time1 = System.currentTimeMillis();
-        appContent.setLyqDateList(appContent.getLyqDateList());
         mainUtils.downFile();
         long time2 = System.currentTimeMillis();
         return CommonResponse.success("一共消耗了" + (time2 - time1) / 1000 + "秒");

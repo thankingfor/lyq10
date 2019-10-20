@@ -108,98 +108,13 @@ public class MainUtils {
 
     public void readFile() {
         downUtils.read();
-        // 反序列化
-        getData(appContent.getDescArray(), dataMap);
-        getData(appContent.getAscArray(), ascDataMap);
-    }
-
-    private void getData(String[] arrays, Map<Integer, List<LyqTable>> map) {
-        Integer groupNum = 0;
-        for (String group: arrays) {
-            String[] gs = group.split(separator3);
-            for (String g: gs) {
-                List<LyqTable> list = getList(g);
-                map.put(groupNum ++, list);
-            }
-        }
     }
 
     /**
      * 下载方法
      */
     public void downFile() {
-        // 主要数据
-        appContent.setDescArray(mapToStrArr(dataMap));
-        appContent.setAscArray(mapToStrArr(ascDataMap));
-        // 下载
         downUtils.down();
     }
 
-    private String[] mapToStrArr(Map<Integer, List<LyqTable>> map) {
-        Integer totalNum = totalCount / splIndex + 1;
-        // 默认一万个数一组
-        String[] arr = new String[totalNum];
-        arr[0] = getListStr(map.get(0));
-        for (int i = 1; i < totalNum; i++) {
-            arr[i] = getArrStr(i * splIndex);
-        }
-        return arr;
-    }
-
-    /**
-     * 反序成对象
-     * seq lyqGroup lyqKey lyqValue lyqSeq
-     */
-    public static List<LyqTable> getList(String dataStr) {
-        List<LyqTable> tables = new LinkedList<>();
-        String[] objs = dataStr.split(separator2);
-        for (String obj : objs) {
-            String[] items = obj.split(separator1);
-            LyqTable lyqTable = new LyqTable();
-            lyqTable.setSeq(Integer.valueOf(items[0]));
-            lyqTable.setLyqGroup(Integer.valueOf(items[1]));
-            lyqTable.setLyqKey(Integer.valueOf(items[2]));
-            lyqTable.setLyqValue(Integer.valueOf(items[3]));
-            lyqTable.setLyqSeq(Integer.valueOf(items[4]));
-            tables.add(lyqTable);
-        }
-
-        return tables;
-    }
-
-    /**
-     * 【1, 10000】
-     * 【2, 20000】
-     */
-    private static String getArrStr(Integer end) {
-        StringBuffer buffer = new StringBuffer();
-        Integer start = end - splIndex + 1;
-        buffer.append(getListStr(dataMap.get(start)));
-        for (int i = start + 1; i <= end; i++) {
-            buffer.append(separator3).append(getListStr(dataMap.get(i)));
-        }
-        return buffer.toString();
-    }
-
-    private static String getListStr(List<LyqTable> mainList) {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append(getStr(mainList.get(0)));
-        for (int i = 1; i < mainList.size(); i ++) {
-            buffer.append(separator2).append(getStr(mainList.get(i)));
-        }
-        return buffer.toString();
-    }
-
-    /**
-     * 所有对象按照 - 分隔符进行分割
-     * seq lyqGroup lyqKey lyqValue lyqSeq
-     */
-    private static String getStr(LyqTable table) {
-        return new StringBuffer().append(table.getSeq()).append(separator1)
-                .append(table.getLyqGroup()).append(separator1)
-                .append(table.getLyqKey()).append(separator1)
-                .append(table.getLyqValue()).append(separator1)
-                .append(table.getLyqSeq()).toString();
-    }
 }
