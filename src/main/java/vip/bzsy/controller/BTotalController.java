@@ -399,7 +399,7 @@ public class BTotalController {
                 analyze4Vos.sort((x, y) -> y.getMinValue() - x.getMinValue());
                 min = analyze4Vos.get(0).getMinKey();
             }
-            LyqAnalyze analyze = appContent.getAnzList().get(groupNum);
+            LyqAnalyze analyze = appContent.getAnzList().get(groupNum - 1);
             analyze.setDesc4(max);
             analyze.setAsc4(min);
         }
@@ -680,12 +680,6 @@ public class BTotalController {
         map.put("total", appContent.getDataMap().size() * rows);
         return map;
     }
-
-    private Map<Integer, List<LyqTable>> getWay(Way way) {
-
-        return null;
-    }
-
 
     /**
      * 2.初始化内存数据

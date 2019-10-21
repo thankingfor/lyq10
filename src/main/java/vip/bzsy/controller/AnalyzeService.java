@@ -20,9 +20,6 @@ import java.util.stream.Collectors;
 public class AnalyzeService {
 
     @Resource
-    private BTotalController bTotalController;
-
-    @Resource
     private AppContent appContent;
 
     /**
@@ -56,7 +53,7 @@ public class AnalyzeService {
             }
 
             if (analyze.getMinAsc3() == analyze.getMinDesc3() && isInArr(analyze.getMinAsc3())) {
-                analyze.setMinRet3(analyze.getMinRet3() - 1);
+                analyze.setMinRet3(analyze.getMinRet3() + 1);
             } else if (analyze.getMinAsc3() == analyze.getMinDesc3() && !isInArr(analyze.getMinAsc3())){
                 analyze.setMinRet3(analyze.getMinRet3() - 1);
             } else {
