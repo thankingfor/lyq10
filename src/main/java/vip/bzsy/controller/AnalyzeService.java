@@ -28,54 +28,84 @@ public class AnalyzeService {
     public void sept1() {
         List<LyqAnalyze> anzList = appContent.getAnzList();
         for (LyqAnalyze analyze: anzList) {
-            if (analyze.getMaxAsc2() == analyze.getMaxDesc2() && isInArr(analyze.getMaxAsc2())) {
-                if (analyze.getMaxRet2() < 0) {
-                    analyze.setMaxRet2(analyze.getMaxRet2() - 1);
+            if (analyze.getMaxAsc2() == analyze.getMaxDesc2()) {
+                if (isInArr(analyze.getMaxAsc2())) {
+                    if (analyze.getMaxRet2() < 0) {
+                        analyze.setMaxRet2(0);
+                    } else {
+                        analyze.setMaxRet2(analyze.getMaxRet2() + 1);
+                    }
                 } else {
-                    analyze.setMaxRet2(analyze.getMaxRet2() + 1);
+                    if (analyze.getMaxRet2() > 0) {
+                        analyze.setMaxRet2(0);
+                    } else {
+                        analyze.setMaxRet2(analyze.getMaxRet2() - 1);
+                    }
                 }
-            } else if (analyze.getMaxAsc2() == analyze.getMaxDesc2() && !isInArr(analyze.getMaxAsc2())){
-                analyze.setMaxRet2(0);
             }
 
-            if (analyze.getMinAsc2() == analyze.getMinDesc2() && isInArr(analyze.getMinAsc2())) {
-                if (analyze.getMinRet2() < 0) {
-                    analyze.setMinRet2(analyze.getMinRet2() - 1);
+            if (analyze.getMinAsc2() == analyze.getMinDesc2()) {
+                if (isInArr(analyze.getMinAsc2())) {
+                    if (analyze.getMinRet2() < 0) {
+                        analyze.setMinRet2(0);
+                    } else {
+                        analyze.setMinRet2(analyze.getMinRet2() + 1);
+                    }
                 } else {
-                    analyze.setMinRet2(analyze.getMinRet2() + 1);
+                    if (analyze.getMinRet2() > 0) {
+                        analyze.setMinRet2(0);
+                    } else {
+                        analyze.setMinRet2(analyze.getMinRet2() - 1);
+                    }
                 }
-            } else if (analyze.getMinAsc2() == analyze.getMinDesc2() && !isInArr(analyze.getMinAsc2())){
-                analyze.setMinRet2(0);
             }
 
-            if (analyze.getMaxAsc3() == analyze.getMaxDesc3() && isInArr(analyze.getMaxAsc3())) {
-                if (analyze.getMaxRet3() < 0) {
-                    analyze.setMaxRet3(analyze.getMaxRet3() - 1);
+            if (analyze.getMaxAsc3() == analyze.getMaxDesc3()) {
+                if (isInArr(analyze.getMaxAsc3())) {
+                    if (analyze.getMaxRet3() < 0) {
+                        analyze.setMaxRet3(0);
+                    } else {
+                        analyze.setMaxRet3(analyze.getMaxRet3() + 1);
+                    }
                 } else {
-                    analyze.setMaxRet3(analyze.getMaxRet3() + 1);
+                    if (analyze.getMaxRet3() > 0) {
+                        analyze.setMaxRet3(0);
+                    } else {
+                        analyze.setMaxRet3(analyze.getMaxRet3() - 1);
+                    }
                 }
-            } else if (analyze.getMaxAsc3() == analyze.getMaxDesc3() && !isInArr(analyze.getMaxAsc3())){
-                analyze.setMaxRet3(0);
             }
 
-            if (analyze.getMinAsc3() == analyze.getMinDesc3() && isInArr(analyze.getMinAsc3())) {
-                if (analyze.getMinRet3() < 0) {
-                    analyze.setMinRet3(analyze.getMinRet3() - 1);
+            if (analyze.getMinAsc3() == analyze.getMinDesc3()) {
+                if (isInArr(analyze.getMinAsc3())) {
+                    if (analyze.getMinRet3() < 0) {
+                        analyze.setMinRet3(0);
+                    } else {
+                        analyze.setMinRet3(analyze.getMinRet3() + 1);
+                    }
                 } else {
-                    analyze.setMinRet3(analyze.getMinRet3() + 1);
+                    if (analyze.getMinRet3() > 0) {
+                        analyze.setMinRet3(0);
+                    } else {
+                        analyze.setMinRet3(analyze.getMinRet3() - 1);
+                    }
                 }
-            } else if (analyze.getMinAsc3() == analyze.getMinDesc3() && !isInArr(analyze.getMinAsc3())){
-                analyze.setMinRet3(0);
             }
 
-            if (analyze.getDesc4() == analyze.getAsc4() && isInArr(analyze.getDesc4())) {
-                if (analyze.getRet4() < 0) {
-                    analyze.setRet4(analyze.getRet4() - 1);
+            if (analyze.getDesc4() == analyze.getAsc4()) {
+                if (isInArr(analyze.getDesc4())) {
+                    if (analyze.getRet4() < 0) {
+                        analyze.setRet4(0);
+                    } else {
+                        analyze.setRet4(analyze.getRet4() + 1);
+                    }
                 } else {
-                    analyze.setRet4(analyze.getRet4() + 1);
+                    if (analyze.getRet4() > 0) {
+                        analyze.setRet4(0);
+                    } else {
+                        analyze.setRet4(analyze.getRet4() - 1);
+                    }
                 }
-            } else if (analyze.getDesc4() == analyze.getAsc4() && !isInArr(analyze.getDesc4())){
-                analyze.setRet4(0);
             }
         }
     }
