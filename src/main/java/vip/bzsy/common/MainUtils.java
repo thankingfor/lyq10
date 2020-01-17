@@ -6,6 +6,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import vip.bzsy.model.AppContent;
 import vip.bzsy.model.LyqDate;
 import vip.bzsy.model.LyqTable;
@@ -56,29 +57,18 @@ public class MainUtils {
         HSSFRow row = sheet.getRow(1);
         String ids = "";
         List<Integer> idsList = new ArrayList<>();
-        for (int i = 14; i <= 18; i++) {
+        for (int i = 1; i <= 10; i++) {
             String cellStringValue = CommonUtils.getCellStringValue(row.getCell(i)).trim();
-            log.info(cellStringValue);
-            if (CommonUtils.isNotEmpty(cellStringValue)) {
-                Integer num = Integer.valueOf(cellStringValue.substring(0, cellStringValue.length() - 2));
-                if (i == 14) {
-                    num = num % 2 == 0 ? 0 : 1;
-                } else if (i == 15) {
-                    num = num % 2 == 0 ? 2 : 3;
-                } else if (i == 16) {
-                    num = num % 2 == 0 ? 4 : 5;
-                } else if (i == 17) {
-                    num = num % 2 == 0 ? 6 : 7;
-                } else if (i == 18) {
-                    num = num % 2 == 0 ? 8 : 9;
+            if (!StringUtils.isEmpty(cellStringValue)) {
+                idsList.add(i -1);
+                if (ids.equals("")) {
+                    ids =  (i - 1) + "";
+                } else {
+                    ids += "," + (i - 1);
                 }
-                idsList.add(num);
-                if (ids == "")
-                    ids = num + "";
-                else
-                    ids = ids + "," + num;
             }
         }
+
         // 获取期号
         HSSFCell cellDateNum = row.getCell(0);
         cellDateNum.setCellType(HSSFCell.CELL_TYPE_STRING);
