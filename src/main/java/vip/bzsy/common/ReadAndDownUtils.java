@@ -1,7 +1,13 @@
 package vip.bzsy.common;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import vip.bzsy.model.*;
 
 import javax.annotation.Resource;
@@ -55,7 +61,7 @@ public class ReadAndDownUtils {
         }
     }
 
-    private void copy(AppContent appContent2) {
+    private void copy(AppContent appContent2) throws IOException {
         // 10个数字
         appContent.setUpDateNum(appContent2.getUpDateNum());
         appContent.setUpNums(appContent2.getUpNums());
@@ -65,5 +71,43 @@ public class ReadAndDownUtils {
         appContent.setLyqDateList(appContent2.getLyqDateList());
         appContent.setDataMap(appContent2.getDataMap());
         appContent.setAscDataMap(appContent2.getAscDataMap());
+        // 252
+        read252();
     }
+
+    public void read252(){
+        try {
+            Map<String, Integer> hashMap = appContent.getMap252();
+            ClassPathResource resource = new ClassPathResource("252组.xlsx");
+            InputStream inputStream = resource.getInputStream();
+            //File file = ResourceUtils.getFile("classpath:252组.xlsx");
+            //log.info("252 path = {}", file.getAbsolutePath());
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            for (int rowNum = 0; rowNum < 300; rowNum ++) {
+                XSSFRow row = sheet.getRow(rowNum);
+                if (row == null || "".equals(CommonUtils.getCellStringValue(row.getCell(12)).trim())) {
+                    continue;
+                }
+                String key = "";
+                Integer value = 0;
+                for (int cellNum = 2; cellNum <= 12; cellNum++) {
+
+                    XSSFCell cell = row.getCell(cellNum);
+                    String cellStringValue = CommonUtils.getCellStringValue(cell).trim();
+
+                    if (cellNum == 12) {
+                        value = Integer.valueOf(cellStringValue);
+                    } else {
+                        key += cellStringValue;
+                    }
+                }
+                hashMap.put(key, value);
+                log.info("252 ::: {}={}", key, value);
+            }
+        } catch (IOException e) {
+            log.error("初始化252出错,{}", e);
+        }
+    }
+
 }

@@ -23,4 +23,6 @@ public class LyqTable implements Serializable {
 
     private Integer lyqSeq;
 
+    private String lyq252;
+
 }

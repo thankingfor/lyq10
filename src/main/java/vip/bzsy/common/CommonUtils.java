@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,36 @@ import java.util.Map;
 @Slf4j
 public class CommonUtils {
 
+    public static String getCellStringValue(XSSFCell cell) {
+        String cellValue = "";
+        if (cell==null){
+            return cellValue;
+        }
+        switch (cell.getCellType()) {
+            case XSSFCell.CELL_TYPE_STRING://字符串类型
+                cellValue = cell.getStringCellValue();
+                if (cellValue.trim().equals("") || cellValue.trim().length() <= 0)
+                    cellValue = " ";
+                break;
+            case XSSFCell.CELL_TYPE_NUMERIC: //数值类型
+                cellValue = String.valueOf((int)cell.getNumericCellValue());
+                break;
+            case XSSFCell.CELL_TYPE_FORMULA: //公式
+                cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                cellValue = String.valueOf(cell.getNumericCellValue());
+                break;
+            case XSSFCell.CELL_TYPE_BLANK:
+                cellValue = " ";
+                break;
+            case XSSFCell.CELL_TYPE_BOOLEAN:
+                break;
+            case XSSFCell.CELL_TYPE_ERROR:
+                break;
+            default:
+                break;
+        }
+        return cellValue;
+    }
 
     public static String getCellStringValue(HSSFCell cell) {
         String cellValue = "";

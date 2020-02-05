@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vip.bzsy.common.CommonResponse;
 import vip.bzsy.common.DataCheckException;
 import vip.bzsy.common.MainUtils;
+import vip.bzsy.common.ReadAndDownUtils;
 import vip.bzsy.enums.Way;
 import vip.bzsy.model.*;
 
@@ -52,23 +53,37 @@ public class BTotalController {
         String dateNum = appContent.getUpDateNum();
         List<LyqTable> list0Desc = copyStart(anInt, Way.DESC);//获取第0组并且按照排序
         List<LyqTable> list0Asc = copyStart(anInt, Way.ASC);//获取第0组并且按照排序
-        List<LyqTable> listMaxDesc = new LinkedList<>();//存放最大值
-        List<ResultVo> listResultVoDesc = new LinkedList<>();
-        List<LyqTable> listMaxAsc = new LinkedList<>();//存放最大值
-        List<ResultVo> listResultVoAsc = new LinkedList<>();
         //开始修改0-3000组的key
         for (int group = 1; group < appContent.getGroupInt(); group++) {
             List<LyqTable> tables = copySort(list0Desc, group, appContent.getDataMap(), Way.DESC);//本组的降序的tables
-            listMaxDesc.add(tables.get(0));//把最大的值存放
-            listResultVoDesc.add(ResultVo.toVo(tables));
             list0Desc = tables;//把list0改成下一组的方便循环
         }
         for (int group = 1; group < appContent.getGroupInt(); group++) {
             List<LyqTable> tables = copySort(list0Asc, group, appContent.getAscDataMap(), Way.ASC);//本组的降序的tables
-            listMaxAsc.add(tables.get(9));//把最大的值存放
-            listResultVoAsc.add(ResultVo.toVoASC(tables));
             list0Asc = tables;//把list0改成下一组的方便循环
         }
+
+        // 第一次任务之前的过滤252过滤
+        fiter252();
+
+        //开始分析
+        List<LyqTable> listMaxDesc = new LinkedList<>();//存放最大值
+        List<ResultVo> listResultVoDesc = new LinkedList<>();
+        List<LyqTable> listMaxAsc = new LinkedList<>();//存放最大值
+        List<ResultVo> listResultVoAsc = new LinkedList<>();
+        for (int group = 1; group < appContent.getGroupInt(); group++) {
+            List<LyqTable> tables = clone(appContent.getDataMap().get(group));
+            tables.sort((x, y) -> y.getLyqValue() - x.getLyqValue()); // 根于value 降序排列
+            listMaxDesc.add(tables.get(0));//把最大的值存放
+            listResultVoDesc.add(ResultVo.toVo(tables));
+        }
+        for (int group = 1; group < appContent.getGroupInt(); group++) {
+            List<LyqTable> tables = clone(appContent.getAscDataMap().get(group));
+            tables.sort((x, y) -> y.getLyqValue() - x.getLyqValue()); // 根于value 降序排列
+            listMaxAsc.add(tables.get(9));//把最大的值存放
+            listResultVoAsc.add(ResultVo.toVoASC(tables));
+        }
+
         long time2 = System.currentTimeMillis();
         print("第一个任务耗时：", time1, time2);
 
@@ -77,22 +92,22 @@ public class BTotalController {
          */
         log.info("准备开始下载模板");
         listMaxDesc = listMaxDesc.stream()
-                .filter(x -> x.getLyqValue() >=0)
+                .filter(x -> x.getLyqValue() >=5)
                 .sorted((x, y) -> y.getLyqValue() - x.getLyqValue())
                 .limit(3000)
                 .collect(Collectors.toList());
         listMaxAsc = listMaxAsc.stream()
-                .filter(x -> x.getLyqValue() >=0)
+                .filter(x -> x.getLyqValue() >=5)
                 .sorted((x, y) -> y.getLyqValue() - x.getLyqValue())
                 .limit(3000)
                 .collect(Collectors.toList());
         listResultVoDesc = listResultVoDesc.stream()
-                .filter(x -> x.getValue2() >=0)
+                .filter(x -> x.getValue2() >=5)
                 .sorted((x, y) -> y.getValue2() - x.getValue2())
                 .limit(3000)
                 .collect(Collectors.toList());
         listResultVoAsc = listResultVoAsc.stream()
-                .filter(x -> x.getValue2() >=0)
+                .filter(x -> x.getValue2() >=5)
                 .sorted((x, y) -> y.getValue2() - x.getValue2())
                 .limit(3000)
                 .collect(Collectors.toList());
@@ -111,6 +126,62 @@ public class BTotalController {
         log.info("获取输出流");
         workbook.write(outputStream);
         log.info("写入输出流");
+    }
+
+    /**
+     * 过滤252
+     * 根据252的文件，找到当前组对应的值
+     * 根据key找到value （key_value）
+     * 把max_key和key_value交换位置
+     */
+    private void fiter252() {
+        filter252Map(appContent.getDataMap());
+        filter252Map(appContent.getAscDataMap());
+    }
+
+    private void filter252Map(Map<Integer, List<LyqTable>> dataMap) {
+        Map<String, Integer> map252 = appContent.getMap252();
+        dataMap.forEach((key, laqtables) -> {
+            List<Integer> key252 = new LinkedList<>();
+            Integer maxKey = -1;
+            Integer maxValue = -1;
+            for (int i = 0; i < laqtables.size(); i ++) {
+                LyqTable lyqTable = laqtables.get(i);
+                lyqTable.setLyq252("");
+                if (maxValue < lyqTable.getLyqValue()) {
+                    maxKey = lyqTable.getLyqKey();
+                    maxValue = lyqTable.getLyqValue();
+                }
+                if (lyqTable.getLyqValue() > 0) {
+                    key252.add(lyqTable.getLyqKey());
+                }
+            }
+
+            String key252Str = "";
+
+            key252.sort(Integer::compareTo);
+            for (Integer key252key: key252) {
+                if (key252key != null) {
+                    key252Str += key252key;
+                }
+            }
+            Integer value252 = map252.get(key252Str);
+            // 把最大的key和当前目标key进行交换
+            if (value252 != null && value252 != -1) {
+                for (LyqTable lyqTable : laqtables) {
+                    if (lyqTable.getLyqKey() == value252) {
+                        lyqTable.setLyqKey(maxKey);
+                        lyqTable.setLyq252(key252Str + "=" + value252);
+                        continue;
+                    }
+                    if (lyqTable.getLyqKey() == maxKey) {
+                        lyqTable.setLyq252("来自" + maxKey);
+                        lyqTable.setLyqKey(value252);
+                        continue;
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -372,6 +443,8 @@ public class BTotalController {
         }
         long time2 = System.currentTimeMillis();
 
+        readAndDownUtils.read252();
+
         print(appContent.getDataMap().size()+"组数据初始化完成，添加到内存总耗时：", time1, time2);
         return CommonResponse.success();
     }
@@ -446,6 +519,13 @@ public class BTotalController {
         row.createCell(10).setCellValue("9");
         row.createCell(11).setCellValue("3000数之样式");
         row.createCell(12).setCellValue("需要上传的3000数");
+
+        row.createCell(14).setCellValue("第一位数");
+        row.createCell(15).setCellValue("第二位数");
+        row.createCell(16).setCellValue("第三位数");
+        row.createCell(17).setCellValue("第四位数");
+        row.createCell(18).setCellValue("第五位数");
+
         //赋值3000模板书数
         Integer[] anInt = new Integer[]{0,1,2,3,4,5,6,7,8,9};
         for (Integer num : anInt) {
@@ -540,4 +620,6 @@ public class BTotalController {
      * 随机对象
      */
     private Random random = new Random();
+
+    @Resource private ReadAndDownUtils readAndDownUtils;
 }

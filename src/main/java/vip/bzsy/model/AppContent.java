@@ -24,6 +24,8 @@ public class AppContent implements Serializable {
     public transient Integer groupInt = 300001;
     /*多少条数据 10*/
     public transient Integer groupRow = 10;
+    /*版本*/
+    public transient String version = "v3";
 
     /**
      * 存放上传的数据 10个中的数字
@@ -49,7 +51,8 @@ public class AppContent implements Serializable {
      */
     private Map<Integer, List<LyqTable>> AscDataMap = new HashMap<>();
 
-    private transient String dataPath = "D:/lyq10/data30w";
-    private transient String dataPathData = "D:/lyq10/data30w/data";
+    private transient String dataPath = "D:/lyq10/"+version+"/"+groupInt;
+    private transient String dataPathData = "D:/lyq10/"+version+"/"+groupInt+"/data";
 
+    private Map<String, Integer> map252 = new HashMap<>();
 }

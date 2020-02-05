@@ -51,23 +51,40 @@ public class MainUtils {
         ascDataMap = appContent.getAscDataMap();
     }
 
+
+
     public void resolver1(HSSFWorkbook workbook) {
         // 获取10个数字
         HSSFSheet sheet = workbook.getSheetAt(0);
         HSSFRow row = sheet.getRow(1);
         String ids = "";
         List<Integer> idsList = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
-            String cellStringValue = CommonUtils.getCellStringValue(row.getCell(i)).trim();
-            if (!StringUtils.isEmpty(cellStringValue)) {
-                idsList.add(i -1);
-                if (ids.equals("")) {
-                    ids =  (i - 1) + "";
-                } else {
-                    ids += "," + (i - 1);
-                }
-            }
-        }
+        // 14
+        String cellStringValue = CommonUtils.getCellStringValue(row.getCell(14)).trim();
+        String cellStringValue2 = cellStringValue.substring(0, cellStringValue.length() - 2);
+        Integer value = Integer.valueOf(cellStringValue2) % 2 == 0 ? 0 : 1;
+        ids +=value;idsList.add(value);
+
+        cellStringValue = CommonUtils.getCellStringValue(row.getCell(15)).trim();
+        cellStringValue2 = cellStringValue.substring(0, cellStringValue.length() - 2);
+        value = Integer.valueOf(cellStringValue2) % 2 == 0 ? 2 : 3;
+        ids +=  "," + value;idsList.add(value);
+
+        cellStringValue = CommonUtils.getCellStringValue(row.getCell(16)).trim();
+        cellStringValue2 = cellStringValue.substring(0, cellStringValue.length() - 2);
+        value = Integer.valueOf(cellStringValue2) % 2 == 0 ? 4 : 5;
+        ids += "," + value;idsList.add(value);
+
+        cellStringValue = CommonUtils.getCellStringValue(row.getCell(17)).trim();
+        cellStringValue2 = cellStringValue.substring(0, cellStringValue.length() - 2);
+        value = Integer.valueOf(cellStringValue2) % 2 == 0 ? 6 : 7;
+        ids += "," + value;idsList.add(value);
+
+        cellStringValue = CommonUtils.getCellStringValue(row.getCell(18)).trim();
+        cellStringValue2 = cellStringValue.substring(0, cellStringValue.length() - 2);
+        value = Integer.valueOf(cellStringValue2) % 2 == 0 ? 8 : 9;
+        ids += "," + value;idsList.add(value);
+
 
         // 获取期号
         HSSFCell cellDateNum = row.getCell(0);
